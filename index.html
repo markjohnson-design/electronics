@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCSE Electronics: Voltage Divider</title>
+    <title>WJEC Mixed Circuit Generator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,7 +11,7 @@
             color: #333;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -21,7 +21,7 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
         }
         h1 {
@@ -30,163 +30,240 @@
             font-size: 1.5rem;
             margin-top: 0;
         }
-        /* Circuit Diagram Container Styles */
         .diagram-container {
             background: #ffffff;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
-            padding: 10px;
+            padding: 20px 0;
             margin-bottom: 20px;
             text-align: center;
+            overflow: visible;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         .control-group {
             background: #f8fafc;
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 8px;
-            margin-bottom: 15px;
             border: 1px solid #e2e8f0;
         }
         label {
             display: flex;
             justify-content: space-between;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #4a5568;
+            font-size: 0.9rem;
         }
-        .val-display { color: #3182ce; }
         input[type=range] { width: 100%; cursor: pointer; }
-        .output-box {
-            background: #2b6cb0;
-            color: white;
+        .val-display { color: #3182ce; }
+        
+        .answers-box {
+            background: #edf2f7;
             padding: 15px;
             border-radius: 8px;
-            text-align: center;
-            margin-top: 20px;
+            border: 1px dashed #a0aec0;
         }
-        .output-value {
-            font-size: 2rem;
+        .answers-box h3 { margin-top: 0; color: #2d3748; font-size: 1.1rem;}
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .ans-item { font-size: 1.1rem; }
+        .ans-val { font-weight: bold; color: #e53e3e; }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 15px;
             font-weight: bold;
-            margin: 5px 0;
         }
+        button:hover { background-color: #2b6cb0; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Voltage Divider Simulator</h1>
+        <h1>WJEC Problem Generator</h1>
 
         <div class="diagram-container">
-            <svg viewBox="0 0 450 300" width="100%" height="250" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 450 400" width="100%" height="300" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748" stroke-width="2" fill="none">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d3748" stroke="none"/>
+                    </marker>
+                    <marker id="arrow-up" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="270">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d3748" stroke="none"/>
+                    </marker>
+                    <marker id="arrow-down" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="90">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d3748" stroke="none"/>
+                    </marker>
+                </defs>
+
+                <circle cx="70" cy="50" r="4" fill="white" stroke="#2d3748" stroke-width="2"/>
+                <text x="35" y="55" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold" id="svg-vsupply">6 V</text>
+                <line x1="74" y1="50" x2="330" y2="50" />
                 
-                <line x1="50" y1="50" x2="50" y2="110" />
-                <line x1="25" y1="110" x2="75" y2="110" stroke-width="4"/>
-                <line x1="35" y1="130" x2="65" y2="130" stroke-width="4"/>
-                <line x1="25" y1="150" x2="75" y2="150" stroke-width="4"/>
-                <line x1="35" y1="170" x2="65" y2="170" stroke-width="4"/>
-                <line x1="25" y1="190" x2="75" y2="190" stroke-width="4"/>
-                <line x1="50" y1="190" x2="50" y2="250" />
-                <text x="85" y="155" fill="#3182ce" stroke="none" font-size="18" font-family="sans-serif" font-weight="bold" id="svg-vin">9V</text>
+                <circle cx="150" cy="50" r="4" fill="#2d3748" />
+                <circle cx="240" cy="220" r="4" fill="#2d3748" />
 
-                <line x1="50" y1="50" x2="140" y2="50" />
-                <circle cx="140" cy="50" r="5" fill="white" />
-                <line x1="140" y1="46" x2="190" y2="20" /> <circle cx="200" cy="50" r="5" fill="white" />
-                <line x1="200" y1="50" x2="300" y2="50" />
-
-                <line x1="50" y1="250" x2="300" y2="250" />
-
-                <circle cx="300" cy="50" r="4" fill="#2d3748" /> <line x1="300" y1="50" x2="300" y2="80" />
-                <rect x="280" y="80" width="40" height="50" fill="white" />
-                <text x="330" y="110" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold" id="svg-r1">10kΩ</text>
-
-                <line x1="300" y1="130" x2="300" y2="170" />
-                <circle cx="300" cy="150" r="4" fill="#2d3748" /> <rect x="280" y="170" width="40" height="50" fill="white" />
-                <text x="330" y="200" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold" id="svg-r2">4.7kΩ</text>
+                <line x1="150" y1="50" x2="150" y2="100" marker-start="url(#arrow-down)" />
+                <rect x="140" y="100" width="20" height="60" fill="white" />
+                <line x1="150" y1="160" x2="150" y2="220" />
                 
-                <line x1="300" y1="220" x2="300" y2="250" />
-                <circle cx="300" cy="250" r="4" fill="#2d3748" /> <line x1="300" y1="50" x2="370" y2="50" />
-                <circle cx="370" cy="50" r="5" fill="white" />
-                <text x="385" y="55" fill="#4a5568" stroke="none" font-size="14" font-family="sans-serif">Point C</text>
+                <text x="160" y="70" fill="#2d3748" stroke="none" font-size="14" font-family="sans-serif">I₁ = <tspan id="svg-i1">2mA</tspan></text>
+                <line x1="120" y1="160" x2="120" y2="100" marker-end="url(#arrow-up)" stroke-width="1"/>
+                <text x="75" y="135" fill="#2d3748" stroke="none" font-size="14" font-family="sans-serif">V₁ = <tspan id="svg-v1">1V</tspan></text>
 
-                <line x1="300" y1="150" x2="370" y2="150" />
-                <circle cx="370" cy="150" r="5" fill="white" />
-                <text x="385" y="145" fill="#4a5568" stroke="none" font-size="14" font-family="sans-serif">Point B</text>
-                <text x="385" y="165" fill="#e53e3e" stroke="none" font-size="18" font-family="sans-serif" font-weight="bold" id="svg-vout">2.88V</text>
+                <line x1="330" y1="50" x2="330" y2="100" marker-start="url(#arrow-down)"/>
+                <rect x="320" y="100" width="20" height="60" fill="white" />
+                <line x1="330" y1="160" x2="330" y2="220" />
+                
+                <text x="340" y="70" fill="#2d3748" stroke="none" font-size="14" font-family="sans-serif">I₂ = <tspan id="svg-i2">6mA</tspan></text>
+                <line x1="350" y1="160" x2="350" y2="100" marker-end="url(#arrow-up)" stroke-width="1"/>
+                <text x="360" y="135" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">V₂ = <tspan id="svg-v2">?</tspan></text>
 
-                <line x1="300" y1="250" x2="370" y2="250" />
-                <circle cx="370" cy="250" r="5" fill="white" />
-                <text x="385" y="255" fill="#4a5568" stroke="none" font-size="14" font-family="sans-serif">Point A (0V)</text>
+                <line x1="150" y1="220" x2="330" y2="220" />
+
+                <line x1="240" y1="220" x2="240" y2="270" marker-start="url(#arrow-down)"/>
+                <rect x="230" y="270" width="20" height="60" fill="white" />
+                <line x1="240" y1="330" x2="240" y2="380" />
+
+                <text x="250" y="245" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">I₃ = <tspan id="svg-i3">?</tspan></text>
+                <line x1="260" y1="330" x2="260" y2="270" marker-end="url(#arrow-up)" stroke-width="1"/>
+                <text x="270" y="305" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">V₃ = <tspan id="svg-v3">?</tspan></text>
+
+                <line x1="240" y1="380" x2="74" y2="380" />
+                <line x1="170" y1="380" x2="150" y2="380" marker-end="url(#arrow)" stroke-width="2"/> <circle cx="70" cy="380" r="4" fill="white" stroke="#2d3748" stroke-width="2"/>
+                
+                <text x="35" y="385" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold">0 V</text>
+                <text x="145" y="370" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">I₄ = <tspan id="svg-i4">?</tspan></text>
+
             </svg>
         </div>
 
-        <div class="control-group">
-            <label>Supply Voltage (Vin) <span id="vin-val" class="val-display">9V</span></label>
-            <input type="range" id="vin" min="1" max="24" value="9" step="0.5">
+        <div class="controls-grid">
+            <div class="control-group">
+                <label>Supply Voltage <span id="vsupply-val" class="val-display">6V</span></label>
+                <input type="range" id="vsupply" min="2" max="24" value="6" step="1">
+            </div>
+            <div class="control-group">
+                <label>Voltage V₁ <span id="v1-val" class="val-display">1V</span></label>
+                <input type="range" id="v1" min="0.5" max="12" value="1" step="0.5">
+            </div>
+            <div class="control-group">
+                <label>Current I₁ <span id="i1-val" class="val-display">2mA</span></label>
+                <input type="range" id="i1" min="1" max="20" value="2" step="1">
+            </div>
+            <div class="control-group">
+                <label>Current I₂ <span id="i2-val" class="val-display">6mA</span></label>
+                <input type="range" id="i2" min="1" max="20" value="6" step="1">
+            </div>
         </div>
 
-        <div class="control-group">
-            <label>Resistor 1 (R1) <span id="r1-val" class="val-display">10kΩ</span></label>
-            <input type="range" id="r1" min="1" max="100" value="10" step="0.1">
-        </div>
+        <button onclick="toggleAnswers()" id="toggle-btn">Reveal Exam Answers</button>
 
-        <div class="control-group">
-            <label>Resistor 2 (R2) <span id="r2-val" class="val-display">4.7kΩ</span></label>
-            <input type="range" id="r2" min="1" max="100" value="4.7" step="0.1">
-        </div>
-
-        <div class="output-box">
-            <div>Vout = Vin × [ R2 / (R1 + R2) ]</div>
-            <div id="vout-display" class="output-value">2.88 V</div>
+        <div class="answers-box hidden" id="answers-box">
+            <h3>Calculated Answers</h3>
+            <div class="answer-grid">
+                <div class="ans-item">(a) V₂ = <span id="ans-v2" class="ans-val">-</span> V</div>
+                <div class="ans-item">(b) I₃ = <span id="ans-i3" class="ans-val">-</span> mA</div>
+                <div class="ans-item">(c) V₃ = <span id="ans-v3" class="ans-val">-</span> V</div>
+                <div class="ans-item">(d) I₄ = <span id="ans-i4" class="ans-val">-</span> mA</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // HTML Input elements
-        const vinInput = document.getElementById('vin');
-        const r1Input = document.getElementById('r1');
-        const r2Input = document.getElementById('r2');
-        
-        // HTML Text elements (Sliders)
-        const vinVal = document.getElementById('vin-val');
-        const r1Val = document.getElementById('r1-val');
-        const r2Val = document.getElementById('r2-val');
-        const voutDisplay = document.getElementById('vout-display');
+        const inputs = ['vsupply', 'v1', 'i1', 'i2'];
+        let showingAnswers = false;
 
-        // SVG Text elements (The diagram!)
-        const svgVin = document.getElementById('svg-vin');
-        const svgR1 = document.getElementById('svg-r1');
-        const svgR2 = document.getElementById('svg-r2');
-        const svgVout = document.getElementById('svg-vout');
+        function updateCircuit() {
+            // 1. Get Values
+            const vsupply = parseFloat(document.getElementById('vsupply').value);
+            const v1 = parseFloat(document.getElementById('v1').value);
+            const i1 = parseFloat(document.getElementById('i1').value);
+            const i2 = parseFloat(document.getElementById('i2').value);
 
-        function calculateVoltage() {
-            // 1. Get current values
-            const vin = parseFloat(vinInput.value);
-            const r1 = parseFloat(r1Input.value) * 1000; 
-            const r2 = parseFloat(r2Input.value) * 1000;
+            // Prevent V1 from being higher than Supply Voltage (physically impossible here)
+            if (v1 >= vsupply) {
+                document.getElementById('v1').value = vsupply - 0.5;
+                return updateCircuit(); // Recalculate
+            }
 
-            // 2. Do the math
-            const vout = vin * (r2 / (r1 + r2));
-            const voutFormatted = vout.toFixed(2) + 'V';
+            // 2. Calculate Exam Answers (Kirchhoff's Laws)
+            const v2 = v1;                  // Components in parallel share voltage
+            const i3 = i1 + i2;             // Currents combine at the node
+            const v3 = vsupply - v1;        // Remaining voltage drops across series resistor
+            const i4 = i3;                  // Current returning to source equals current through R3
 
-            // 3. Update the UI text above the sliders
-            vinVal.textContent = vin + 'V';
-            r1Val.textContent = r1Input.value + 'kΩ';
-            r2Val.textContent = r2Input.value + 'kΩ';
-            voutDisplay.textContent = voutFormatted;
+            // 3. Update Input Labels
+            document.getElementById('vsupply-val').textContent = vsupply + 'V';
+            document.getElementById('v1-val').textContent = v1 + 'V';
+            document.getElementById('i1-val').textContent = i1 + 'mA';
+            document.getElementById('i2-val').textContent = i2 + 'mA';
 
-            // 4. Update the text INSIDE the drawing!
-            svgVin.textContent = vin + 'V';
-            svgR1.textContent = r1Input.value + 'kΩ';
-            svgR2.textContent = r2Input.value + 'kΩ';
-            svgVout.textContent = voutFormatted;
+            // 4. Update SVG Knowns
+            document.getElementById('svg-vsupply').textContent = vsupply + ' V';
+            document.getElementById('svg-v1').textContent = v1 + 'V';
+            document.getElementById('svg-i1').textContent = i1 + 'mA';
+            document.getElementById('svg-i2').textContent = i2 + 'mA';
+
+            // 5. Update Answers Box
+            document.getElementById('ans-v2').textContent = v2;
+            document.getElementById('ans-i3').textContent = i3;
+            document.getElementById('ans-v3').textContent = v3;
+            document.getElementById('ans-i4').textContent = i4;
+
+            // 6. Update SVG Answers (if revealed)
+            if (showingAnswers) {
+                document.getElementById('svg-v2').textContent = v2 + 'V';
+                document.getElementById('svg-i3').textContent = i3 + 'mA';
+                document.getElementById('svg-v3').textContent = v3 + 'V';
+                document.getElementById('svg-i4').textContent = i4 + 'mA';
+            } else {
+                document.getElementById('svg-v2').textContent = '?';
+                document.getElementById('svg-i3').textContent = '?';
+                document.getElementById('svg-v3').textContent = '?';
+                document.getElementById('svg-i4').textContent = '?';
+            }
         }
 
-        // Listen for slider movement
-        vinInput.addEventListener('input', calculateVoltage);
-        r1Input.addEventListener('input', calculateVoltage);
-        r2Input.addEventListener('input', calculateVoltage);
+        function toggleAnswers() {
+            showingAnswers = !showingAnswers;
+            const box = document.getElementById('answers-box');
+            const btn = document.getElementById('toggle-btn');
+            
+            if (showingAnswers) {
+                box.classList.remove('hidden');
+                btn.textContent = 'Hide Exam Answers';
+            } else {
+                box.classList.add('hidden');
+                btn.textContent = 'Reveal Exam Answers';
+            }
+            updateCircuit();
+        }
 
-        // Run once on load
-        calculateVoltage();
+        // Add event listeners
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateCircuit);
+        });
+
+        // Initial run
+        updateCircuit();
     </script>
+
 </body>
 </html>
