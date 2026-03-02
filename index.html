@@ -450,52 +450,138 @@
             document.getElementById('score-display').textContent = `${totalC} / ${totalA}`;
         }
 
+        // --- ENHANCED CANVAS REPORT GENERATOR ---
         function downloadImageScore() {
-            const studentName = prompt("Enter your name for the Score Report:");
+            const studentName = prompt("Enter your name for the official report:");
             if (studentName === null) return; 
             const displayName = studentName.trim() || "Student";
 
             const canvas = document.createElement('canvas');
-            canvas.width = 500;
-            canvas.height = 430; 
+            canvas.width = 600;
+            canvas.height = 620; 
             const ctx = canvas.getContext('2d');
 
-            ctx.fillStyle = "#f4f6f8"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#001f3f"; ctx.fillRect(0, 0, canvas.width, 90);
+            // 1. Background
+            ctx.fillStyle = "#ffffff"; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Official Double Border
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = "#001f3f"; // Navy
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+            
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#B30059"; // Cerise
+            ctx.strokeRect(22, 22, canvas.width - 44, canvas.height - 44);
+
+            // 3. Draw Abstract "A" Shield Logo (Avoids CORS issues with external images)
+            ctx.fillStyle = "#001f3f";
+            ctx.beginPath();
+            ctx.moveTo(270, 50);
+            ctx.lineTo(330, 50);
+            ctx.lineTo(330, 90);
+            ctx.quadraticCurveTo(330, 120, 300, 135); // Right curve
+            ctx.quadraticCurveTo(270, 120, 270, 90);  // Left curve
+            ctx.closePath();
+            ctx.fill();
 
             ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 28px sans-serif";
+            ctx.font = "bold 36px serif";
             ctx.textAlign = "center";
-            ctx.fillText("ABINGDON SCHOOL", 250, 40);
+            ctx.fillText("A", 300, 105);
+
+            // 4. Headers
+            ctx.fillStyle = "#001f3f";
+            ctx.font = "bold 32px serif";
+            ctx.fillText("ABINGDON SCHOOL", 300, 175);
             
             ctx.fillStyle = "#B30059"; 
             ctx.font = "bold 18px sans-serif";
-            ctx.fillText("GCSE Electronics Revision Report", 250, 68);
+            ctx.fillText("ELECTRONICS REVISION REPORT", 300, 205);
 
-            ctx.fillStyle = "#001f3f";
+            // 5. Student Info
+            ctx.fillStyle = "#2d3748";
+            ctx.font = "18px sans-serif";
             ctx.textAlign = "left";
-            ctx.font = "bold 20px sans-serif";
-            ctx.fillText("Name: " + displayName, 40, 130);
-            ctx.font = "16px sans-serif";
-            ctx.fillText("Date: " + new Date().toLocaleDateString(), 40, 155);
+            ctx.fillText("Name: " + displayName, 60, 260);
+            
+            ctx.textAlign = "right";
+            ctx.fillText("Date: " + new Date().toLocaleDateString(), 540, 260);
 
-            ctx.fillStyle = "#4a5568";
-            ctx.font = "18px monospace";
-            let yPos = 200;
+            // Divider Line
+            ctx.beginPath();
+            ctx.moveTo(60, 275);
+            ctx.lineTo(540, 275);
+            ctx.strokeStyle = "#e2e8f0";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 6. Styled Scores Table
+            let yPos = 310;
+            
+            // Table Header Bar
+            ctx.fillStyle = "#001f3f";
+            ctx.fillRect(60, yPos, 480, 35);
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 16px sans-serif";
+            ctx.textAlign = "left";
+            ctx.fillText("Revision Topic", 80, yPos + 23);
+            ctx.textAlign = "center";
+            ctx.fillText("Correct", 380, yPos + 23);
+            ctx.fillText("Attempts", 470, yPos + 23);
+
+            // Table Rows
+            yPos += 35;
             let totalC = 0, totalA = 0;
+            let rowIndex = 0;
 
             for (let key in scores) {
                 let sec = scores[key];
                 totalC += sec.correct;
                 totalA += sec.attempts;
-                ctx.fillText(sec.name.padEnd(20, ' ') + ` :  ${sec.correct} / ${sec.attempts}`, 60, yPos);
+                
+                // Alternating row colors
+                ctx.fillStyle = (rowIndex % 2 === 0) ? "#f8fafc" : "#edf2f7";
+                ctx.fillRect(60, yPos, 480, 30);
+                
+                ctx.fillStyle = "#2d3748";
+                ctx.font = "16px sans-serif";
+                ctx.textAlign = "left";
+                ctx.fillText(sec.name, 80, yPos + 21);
+                
+                ctx.textAlign = "center";
+                ctx.fillText(sec.correct.toString(), 380, yPos + 21);
+                ctx.fillText(sec.attempts.toString(), 470, yPos + 21);
+                
                 yPos += 30;
+                rowIndex++;
             }
 
+            // 7. Final Score Badge
+            let percentage = totalA === 0 ? 0 : Math.round((totalC / totalA) * 100);
+            let badgeY = yPos + 60;
+            
             ctx.fillStyle = "#B30059";
+            ctx.beginPath();
+            ctx.arc(460, badgeY, 40, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = "#ffffff";
             ctx.font = "bold 22px sans-serif";
-            ctx.fillText(`Overall Score: ${totalC} / ${totalA}`, 40, yPos + 35);
+            ctx.textAlign = "center";
+            ctx.fillText(percentage + "%", 460, badgeY + 8);
 
+            ctx.fillStyle = "#001f3f";
+            ctx.font = "bold 24px sans-serif";
+            ctx.textAlign = "left";
+            ctx.fillText("Final Score:", 60, badgeY - 5);
+            
+            ctx.fillStyle = "#4a5568";
+            ctx.font = "20px sans-serif";
+            ctx.fillText(totalC + " out of " + totalA + " correct", 60, badgeY + 20);
+
+            // Trigger Download
             const link = document.createElement('a');
             link.download = `Abingdon_Electronics_${displayName.replace(/[^a-z0-9]/gi, '_')}.png`;
             link.href = canvas.toDataURL("image/png");
