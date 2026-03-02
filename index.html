@@ -3,171 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WJEC GCSE Resistor Problem Generator</title>
+    <title>GCSE Electronics: Voltage Divider</title>
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f4; color: #333; margin: 2em; }
-        .container { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 2em; max-width: 800px; margin: auto; }
-        h1 { text-align: center; color: #2c3e50; }
-        .circuit-box { text-align: center; margin-bottom: 2em; }
-        .circuit-diagram { position: relative; display: inline-block; }
-        .circuit-diagram img { max-width: 100%; height: auto; display: block; }
-        .control-panel, .question-text { padding: 1em; background-color: #e9ecef; border-radius: 5px; margin-bottom: 2em; }
-        .inputs-group { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
-        label { display: flex; flex-direction: column; font-weight: bold; margin-bottom: 5px; }
-        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; background-color: #3498db; color: #fff; font-size: 1.1em; }
-        button:hover { background-color: #2980b9; }
-        .answers-group { margin-top: 1em; padding-top: 1em; border-top: 1px solid #ddd; }
-        .hidden { display: none; }
-        .value { font-family: monospace; font-size: 1.2em; border-bottom: 1px solid #333; padding: 0 5px; }
-        .correct { color: #27ae60; font-weight: bold; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-top: 0;
+        }
+        /* Circuit Diagram Container Styles */
+        .diagram-container {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .control-group {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        .val-display { color: #3182ce; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .output-box {
+            background: #2b6cb0;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .output-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>WJEC Electronics GCSE Resistor Problem Generator</h1>
+    <div class="container">
+        <h1>Voltage Divider Simulator</h1>
 
-    <div class="control-panel">
-        <p><strong>Step 1: Define Input Variables</strong></p>
-        <p>This general calculator takes the basic circuit inputs (Supply Voltage and three Resistors) to calculate all voltages and currents, allowing you to create infinitely new test questions!</p>
-        <div class="inputs-group">
-            <label>Supply (V):
-                <input type="number" id="input_vSupply" value="6" step="0.5">
-            </label>
-            <label>Resistor R1 (kΩ):
-                <input type="number" id="input_r1" value="0.5" step="0.01">
-            </label>
-            <label>Resistor R2 (kΩ):
-                <input type="number" id="input_r2" value="0.167" step="0.01">
-            </label>
-            <label>Resistor R3 (kΩ):
-                <input type="number" id="input_r3" value="0.625" step="0.01">
-            </label>
+        <div class="diagram-container">
+            <svg viewBox="0 0 450 300" width="100%" height="250" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                
+                <line x1="50" y1="50" x2="50" y2="110" />
+                <line x1="25" y1="110" x2="75" y2="110" stroke-width="4"/>
+                <line x1="35" y1="130" x2="65" y2="130" stroke-width="4"/>
+                <line x1="25" y1="150" x2="75" y2="150" stroke-width="4"/>
+                <line x1="35" y1="170" x2="65" y2="170" stroke-width="4"/>
+                <line x1="25" y1="190" x2="75" y2="190" stroke-width="4"/>
+                <line x1="50" y1="190" x2="50" y2="250" />
+                <text x="85" y="155" fill="#3182ce" stroke="none" font-size="18" font-family="sans-serif" font-weight="bold" id="svg-vin">9V</text>
+
+                <line x1="50" y1="50" x2="140" y2="50" />
+                <circle cx="140" cy="50" r="5" fill="white" />
+                <line x1="140" y1="46" x2="190" y2="20" /> <circle cx="200" cy="50" r="5" fill="white" />
+                <line x1="200" y1="50" x2="300" y2="50" />
+
+                <line x1="50" y1="250" x2="300" y2="250" />
+
+                <circle cx="300" cy="50" r="4" fill="#2d3748" /> <line x1="300" y1="50" x2="300" y2="80" />
+                <rect x="280" y="80" width="40" height="50" fill="white" />
+                <text x="330" y="110" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold" id="svg-r1">10kΩ</text>
+
+                <line x1="300" y1="130" x2="300" y2="170" />
+                <circle cx="300" cy="150" r="4" fill="#2d3748" /> <rect x="280" y="170" width="40" height="50" fill="white" />
+                <text x="330" y="200" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold" id="svg-r2">4.7kΩ</text>
+                
+                <line x1="300" y1="220" x2="300" y2="250" />
+                <circle cx="300" cy="250" r="4" fill="#2d3748" /> <line x1="300" y1="50" x2="370" y2="50" />
+                <circle cx="370" cy="50" r="5" fill="white" />
+                <text x="385" y="55" fill="#4a5568" stroke="none" font-size="14" font-family="sans-serif">Point C</text>
+
+                <line x1="300" y1="150" x2="370" y2="150" />
+                <circle cx="370" cy="150" r="5" fill="white" />
+                <text x="385" y="145" fill="#4a5568" stroke="none" font-size="14" font-family="sans-serif">Point B</text>
+                <text x="385" y="165" fill="#e53e3e" stroke="none" font-size="18" font-family="sans-serif" font-weight="bold" id="svg-vout">2.88V</text>
+
+                <line x1="300" y1="250" x2="370" y2="250" />
+                <circle cx="370" cy="250" r="5" fill="white" />
+                <text x="385" y="255" fill="#4a5568" stroke="none" font-size="14" font-family="sans-serif">Point A (0V)</text>
+            </svg>
         </div>
-        <div style="text-align: center; margin-top: 1em;">
-            <button onclick="calculateCircuit()">Calculate Answers</button>
-            <button onclick="resetInputsToOriginal()" style="background-color: #95a5a6;">Reset to Original Problem</button>
+
+        <div class="control-group">
+            <label>Supply Voltage (Vin) <span id="vin-val" class="val-display">9V</span></label>
+            <input type="range" id="vin" min="1" max="24" value="9" step="0.5">
+        </div>
+
+        <div class="control-group">
+            <label>Resistor 1 (R1) <span id="r1-val" class="val-display">10kΩ</span></label>
+            <input type="range" id="r1" min="1" max="100" value="10" step="0.1">
+        </div>
+
+        <div class="control-group">
+            <label>Resistor 2 (R2) <span id="r2-val" class="val-display">4.7kΩ</span></label>
+            <input type="range" id="r2" min="1" max="100" value="4.7" step="0.1">
+        </div>
+
+        <div class="output-box">
+            <div>Vout = Vin × [ R2 / (R1 + R2) ]</div>
+            <div id="vout-display" class="output-value">2.88 V</div>
         </div>
     </div>
 
-    <div class="question-text">
-        <p><strong>Step 2: Generate Question Text based on inputs</strong></p>
-        <p>Below is a custom problem based on your input variables. Students could solve for the hidden answers based on the known information given in the text.</p>
-        <p>A circuit is configured as shown below with a supply voltage of <span id="q_vSupply" class="value">6V</span>.</p>
-        <p>The current through the left parallel branch is measured to be <span id="q_i1" class="value">2mA</span>, and the voltage across it is <span id="q_v1" class="value">1V</span>.</p>
-        <p>The current entering the right parallel branch is <span id="q_i2" class="value">6mA</span>.</p>
-        <p>Using these known values, find the answers for (a) to (d).</p>
-    </div>
+    <script>
+        // HTML Input elements
+        const vinInput = document.getElementById('vin');
+        const r1Input = document.getElementById('r1');
+        const r2Input = document.getElementById('r2');
+        
+        // HTML Text elements (Sliders)
+        const vinVal = document.getElementById('vin-val');
+        const r1Val = document.getElementById('r1-val');
+        const r2Val = document.getElementById('r2-val');
+        const voutDisplay = document.getElementById('vout-display');
 
-    <div class="circuit-box">
-        <p><strong>Current Circuit State (Verifying inputs match diagram logic)</strong></p>
-        <div class="circuit-diagram">
-            <img src="your_circuit_screenshot_or_cleaned_up_svg.png" alt="WJEC electronics resistor circuit diagram">
-            <p style="font-size: 0.9em; color: #777;"><em>Note: This image can be swapped for a clean illustration. JavaScript will update a general version with the labels derived above.</em></p>
-        </div>
-    </div>
+        // SVG Text elements (The diagram!)
+        const svgVin = document.getElementById('svg-vin');
+        const svgR1 = document.getElementById('svg-r1');
+        const svgR2 = document.getElementById('svg-r2');
+        const svgVout = document.getElementById('svg-vout');
 
-    <div class="control-panel">
-        <p><strong>Step 3: Self-Test Answers</strong></p>
-        <p>Click the button below to reveal the calculated answers for your custom problem!</p>
-        <div style="text-align: center;">
-            <button onclick="toggleAnswers()">Show / Hide Answers</button>
-        </div>
+        function calculateVoltage() {
+            // 1. Get current values
+            const vin = parseFloat(vinInput.value);
+            const r1 = parseFloat(r1Input.value) * 1000; 
+            const r2 = parseFloat(r2Input.value) * 1000;
 
-        <div id="answers_group" class="answers-group hidden">
-            <p><strong>Answers:</strong></p>
-            <ul>
-                <li>(a) What is the value of V₂? <span id="ans_v2" class="correct value">-</span> V</li>
-                <li>(b) What is the value of I₃? <span id="ans_i3" class="correct value">-</span> mA</li>
-                <li>(c) What is the value of V₃? <span id="ans_v3" class="correct value">-</span> V</li>
-                <li>(d) What is the value of I₄? <span id="ans_i4" class="correct value">-</span> mA</li>
-            </ul>
-        </div>
-    </div>
+            // 2. Do the math
+            const vout = vin * (r2 / (r1 + r2));
+            const voutFormatted = vout.toFixed(2) + 'V';
 
-</div>
+            // 3. Update the UI text above the sliders
+            vinVal.textContent = vin + 'V';
+            r1Val.textContent = r1Input.value + 'kΩ';
+            r2Val.textContent = r2Input.value + 'kΩ';
+            voutDisplay.textContent = voutFormatted;
 
-<script>
-    // Variables for the exact values from the original problem to enable a reset button.
-    const ORIGINAL_VSUPPLY = 6;
-    const ORIGINAL_R1 = 0.5;
-    const ORIGINAL_R2 = 0.16666666666666666; // approx 1/6
-    const ORIGINAL_R3 = 0.625;
-
-    // Helper function to update text content of a collection of elements.
-    function updateLabel(id, text) {
-        document.getElementById(id).textContent = text;
-    }
-
-    // This is the core logical function for your WJEC GCSE deep-dive!
-    function calculateCircuit() {
-        // Read user inputs, ensuring they are numbers.
-        const vSupply = parseFloat(document.getElementById('input_vSupply').value);
-        const r1 = parseFloat(document.getElementById('input_r1').value);
-        const r2 = parseFloat(document.getElementById('input_r2').value);
-        const r3 = parseFloat(document.getElementById('input_r3').value);
-
-        // -- Calculation Logic --
-
-        // 1. Calculate combined resistances.
-        const Rp = (r1 * r2) / (r1 + r2);
-        const Rtotal = Rp + r3;
-
-        // 2. Solve for Total Circuit Current (in mA).
-        const Itotal = vSupply / Rtotal;
-        const i3 = Itotal;
-        const i4 = Itotal;
-
-        // 3. Solve for Parallel and Series Voltages (in V).
-        const v_parallel = Itotal * Rp; // This is the voltage across the parallel group, i.e., both V1 and V2.
-        const v1 = v_parallel;
-        const v2 = v_parallel;
-        const v3 = Itotal * r3; // The voltage across the series resistor R3.
-
-        // 4. Solve for Branch Currents (in mA).
-        const i1 = v1 / r1; // The current in the left branch.
-        const i2 = v2 / r2; // The current entering the right branch.
-
-        // -- Update user interface with results --
-
-        // First, update the "Question text" block to create a clean problem statement from your new variables.
-        updateLabel('q_vSupply', `${vSupply.toFixed(0)}V`);
-        updateLabel('q_i1', `${i1.toFixed(0)}mA`);
-        updateLabel('q_v1', `${v1.toFixed(0)}V`);
-        updateLabel('q_i2', `${i2.toFixed(0)}mA`);
-
-        // Second, update the answer list values for self-testing.
-        updateLabel('ans_v2', v2.toFixed(0)); // WJEC often uses integer results in simple problems.
-        updateLabel('ans_i3', i3.toFixed(0));
-        updateLabel('ans_v3', v3.toFixed(0));
-        updateLabel('ans_i4', i4.toFixed(0));
-
-        // Note: You can change ".toFixed(0)" to ".toFixed(2)" to show result with decimal precision.
-    }
-
-    // Toggle the visibility of the answer key section.
-    function toggleAnswers() {
-        const answersGroup = document.getElementById('answers_group');
-        answersGroup.classList.toggle('hidden');
-    }
-
-    // A handy button to restore inputs to the defaults from the image.
-    function resetInputsToOriginal() {
-        document.getElementById('input_vSupply').value = ORIGINAL_VSUPPLY;
-        document.getElementById('input_r1').value = ORIGINAL_R1.toFixed(2);
-        document.getElementById('input_r2').value = ORIGINAL_R2.toFixed(2);
-        document.getElementById('input_r3').value = ORIGINAL_R3.toFixed(2);
-        calculateCircuit(); // Trigger a recalculation after reset.
-        if (!document.getElementById('answers_group').classList.contains('hidden')) {
-            toggleAnswers(); // Hide answers on reset.
+            // 4. Update the text INSIDE the drawing!
+            svgVin.textContent = vin + 'V';
+            svgR1.textContent = r1Input.value + 'kΩ';
+            svgR2.textContent = r2Input.value + 'kΩ';
+            svgVout.textContent = voutFormatted;
         }
-    }
 
-    // Run calculation once at startup to set up default text.
-    resetInputsToOriginal(); // Start with the image values.
+        // Listen for slider movement
+        vinInput.addEventListener('input', calculateVoltage);
+        r1Input.addEventListener('input', calculateVoltage);
+        r2Input.addEventListener('input', calculateVoltage);
 
-</script>
-
+        // Run once on load
+        calculateVoltage();
+    </script>
 </body>
 </html>
