@@ -127,7 +127,15 @@
         }
         .control-group { display: flex; flex-direction: column; }
         label { font-weight: bold; margin-bottom: 5px; color: #4a5568; font-size: 0.9rem;}
-        input[type="number"], input[type="range"] { padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; outline-color: var(--abingdon-cerise); }
+        
+        /* Input Field Base Styles */
+        input[type="number"], input[type="range"] { 
+            padding: 8px; 
+            border: 2px solid #cbd5e0; 
+            border-radius: 4px; 
+            outline-color: var(--abingdon-cerise); 
+            transition: border-color 0.3s, background-color 0.3s;
+        }
         
         /* Buttons */
         .action-btn {
@@ -456,7 +464,7 @@
             link.click();
         }
 
-        // --- TAB NAVIGATION & FEEDBACK LOGIC ---
+        // --- UI FEEDBACK HELPERS ---
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("tab-content");
             for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active"); 
@@ -478,6 +486,26 @@
             el.innerHTML = message;
         }
 
+        // Sets individual input box to red or green
+        function setInputFeedback(id, isCorrect) {
+            const el = document.getElementById(id);
+            if (isCorrect) {
+                el.style.borderColor = '#48bb78';
+                el.style.backgroundColor = '#f0fff4';
+            } else {
+                el.style.borderColor = '#f56565';
+                el.style.backgroundColor = '#fff5f5';
+            }
+        }
+
+        // Clears red/green formatting from an input box
+        function clearInputFeedback(id) {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.style.borderColor = '';
+            el.style.backgroundColor = '';
+        }
+
         // --- LOGIC FUNCTIONS ---
         // TAB 0: Mixed Circuit
         let currentMixed = {};
@@ -494,11 +522,9 @@
             document.getElementById('mixed-v1').textContent = currentMixed.v1 + 'V';
             document.getElementById('mixed-i1').textContent = currentMixed.i1 + 'mA';
             document.getElementById('mixed-i2').textContent = currentMixed.i2 + 'mA';
+            
             document.getElementById('feedback-mixed').style.display = 'none';
-            document.getElementById('ans-mixed-v2').value = '';
-            document.getElementById('ans-mixed-i3').value = '';
-            document.getElementById('ans-mixed-v3').value = '';
-            document.getElementById('ans-mixed-i4').value = '';
+            ['ans-mixed-v2', 'ans-mixed-i3', 'ans-mixed-v3', 'ans-mixed-i4'].forEach(clearInputFeedback);
         }
         function checkMixed() {
             if (solvedState.mixed) return;
@@ -506,23 +532,38 @@
             const uI3 = parseFloat(document.getElementById('ans-mixed-i3').value);
             const uV3 = parseFloat(document.getElementById('ans-mixed-v3').value);
             const uI4 = parseFloat(document.getElementById('ans-mixed-i4').value);
-            if(isNaN(uV2) || isNaN(uI3) || isNaN(uV3) || isNaN(uI4)) return alert("Please fill in all answers.");
+            
+            if(isNaN(uV2) || isNaN(uI3) || isNaN(uV3) || isNaN(uI4)) return alert("Please fill in all 4 answers before checking.");
 
             scores.mixed.attempts++;
-            if (uV2 === currentMixed.v1 && uI3 === (currentMixed.i1 + currentMixed.i2) && uV3 === (currentMixed.vs - currentMixed.v1) && uI4 === (currentMixed.i1 + currentMixed.i2)) {
+            
+            const cV2 = currentMixed.v1;
+            const cI3 = currentMixed.i1 + currentMixed.i2;
+            const cV3 = currentMixed.vs - currentMixed.v1;
+            const cI4 = cI3;
+
+            let allCorrect = true;
+
+            // Apply specific box feedback
+            if (uV2 === cV2) setInputFeedback('ans-mixed-v2', true); else { setInputFeedback('ans-mixed-v2', false); allCorrect = false; }
+            if (uI3 === cI3) setInputFeedback('ans-mixed-i3', true); else { setInputFeedback('ans-mixed-i3', false); allCorrect = false; }
+            if (uV3 === cV3) setInputFeedback('ans-mixed-v3', true); else { setInputFeedback('ans-mixed-v3', false); allCorrect = false; }
+            if (uI4 === cI4) setInputFeedback('ans-mixed-i4', true); else { setInputFeedback('ans-mixed-i4', false); allCorrect = false; }
+
+            if (allCorrect) {
                 scores.mixed.correct++;
                 solvedState.mixed = true;
                 document.getElementById('btn-check-mixed').disabled = true;
                 document.getElementById('btn-reveal-mixed').disabled = true;
                 showFeedback('feedback-mixed', true, `All correct! Excellent application of Kirchhoff's Laws.`);
             } else {
-                showFeedback('feedback-mixed', false, `Not quite. Remember:<br>Parallel branches share voltage (V₂ = V₁).<br>Currents sum at a junction (I₃ = I₁ + I₂).<br>Series voltages sum to the supply (V₃ = Supply - V₁).`);
+                showFeedback('feedback-mixed', false, `Some answers are incorrect (highlighted in red). Fix them and try again!`);
             }
             updateScoreboard();
         }
         function revealMixed() {
             if (solvedState.mixed) return;
-            solvedState.mixed = true; // Lock scoring
+            solvedState.mixed = true;
             document.getElementById('btn-check-mixed').disabled = true;
             document.getElementById('btn-reveal-mixed').disabled = true;
             
@@ -531,6 +572,11 @@
             const cV3 = currentMixed.vs - currentMixed.v1;
             const cI4 = cI3;
             
+            ['ans-mixed-v2', 'ans-mixed-i3', 'ans-mixed-v3', 'ans-mixed-i4'].forEach(id => {
+                document.getElementById(id).style.borderColor = '';
+                document.getElementById(id).style.backgroundColor = '';
+            });
+
             document.getElementById('ans-mixed-v2').value = cV2;
             document.getElementById('ans-mixed-i3').value = cI3;
             document.getElementById('ans-mixed-v3').value = cV3;
@@ -557,22 +603,26 @@
             document.getElementById('led-vf-txt').textContent = 'Vf: ' + currentLED.vf + 'V';
             document.getElementById('led-i-txt').textContent = 'Target: ' + currentLED.i + 'mA';
             document.getElementById('feedback-led').style.display = 'none';
-            document.getElementById('ans-led').value = '';
+            clearInputFeedback('ans-led');
         }
         function checkLED() {
             if (solvedState.led) return; 
             const userAns = parseFloat(document.getElementById('ans-led').value);
-            if(isNaN(userAns)) return;
+            if(isNaN(userAns)) return alert("Please enter a number.");
             
             scores.led.attempts++;
             const correctR = ((currentLED.vs - currentLED.vf) / (currentLED.i / 1000));
             if (Math.abs(userAns - correctR) < 5) {
+                setInputFeedback('ans-led', true);
                 scores.led.correct++;
                 solvedState.led = true;
                 document.getElementById('btn-check-led').disabled = true;
                 document.getElementById('btn-reveal-led').disabled = true;
-                showFeedback('feedback-led', true, `Correct!`);
-            } else showFeedback('feedback-led', false, "Incorrect. Subtract Vf from the supply voltage, then use Ohm's Law (V=IR), converting mA to Amps!");
+                showFeedback('feedback-led', true, `Correct! ${currentLED.vs}V - ${currentLED.vf}V = ${(currentLED.vs - currentLED.vf).toFixed(1)}V across the resistor. R = V/I = ${(currentLED.vs - currentLED.vf).toFixed(1)} / 0.${currentLED.i}A = ${correctR.toFixed(0)}Ω.`);
+            } else {
+                setInputFeedback('ans-led', false);
+                showFeedback('feedback-led', false, "Incorrect. Try again! (Hint: Subtract Vf from the supply voltage first).");
+            }
             updateScoreboard();
         }
         function revealLED() {
@@ -580,6 +630,8 @@
             solvedState.led = true;
             document.getElementById('btn-check-led').disabled = true;
             document.getElementById('btn-reveal-led').disabled = true;
+            document.getElementById('ans-led').style.borderColor = '';
+            document.getElementById('ans-led').style.backgroundColor = '';
             
             const correctR = ((currentLED.vs - currentLED.vf) / (currentLED.i / 1000)).toFixed(0);
             document.getElementById('ans-led').value = correctR;
@@ -602,8 +654,8 @@
             document.getElementById('ldr-vs-txt').textContent = currentLDR.vs + 'V';
             document.getElementById('ldr-r1-txt').textContent = 'R1: ' + currentLDR.r1 + 'kΩ';
             document.getElementById('feedback-ldr').style.display = 'none';
-            document.getElementById('ans-ldr').value = '';
             document.getElementById('ldr-slider').value = 1;
+            clearInputFeedback('ans-ldr');
             updateLDR();
         }
         function updateLDR() {
@@ -614,21 +666,27 @@
             document.getElementById('btn-check-ldr').disabled = false;
             document.getElementById('btn-reveal-ldr').disabled = false;
             document.getElementById('feedback-ldr').style.display = 'none';
+            document.getElementById('ans-ldr').style.borderColor = '';
+            document.getElementById('ans-ldr').style.backgroundColor = '';
         }
         function checkLDR() {
             if (solvedState.ldr) return;
             const userAns = parseFloat(document.getElementById('ans-ldr').value);
-            if(isNaN(userAns)) return;
+            if(isNaN(userAns)) return alert("Please enter a number.");
             
             scores.ldr.attempts++;
             const correctV = currentLDR.vs * (currentLDR.r2 / (currentLDR.r1 + currentLDR.r2));
             if (Math.abs(userAns - correctV) < 0.2) {
+                setInputFeedback('ans-ldr', true);
                 scores.ldr.correct++;
                 solvedState.ldr = true;
                 document.getElementById('btn-check-ldr').disabled = true;
                 document.getElementById('btn-reveal-ldr').disabled = true;
                 showFeedback('feedback-ldr', true, `Correct!`);
-            } else showFeedback('feedback-ldr', false, "Incorrect. Use the voltage divider formula: Vout = Vin × [ R_bottom / (R_top + R_bottom) ].");
+            } else {
+                setInputFeedback('ans-ldr', false);
+                showFeedback('feedback-ldr', false, "Incorrect. Have another go!");
+            }
             updateScoreboard();
         }
         function revealLDR() {
@@ -636,6 +694,8 @@
             solvedState.ldr = true;
             document.getElementById('btn-check-ldr').disabled = true;
             document.getElementById('btn-reveal-ldr').disabled = true;
+            document.getElementById('ans-ldr').style.borderColor = '';
+            document.getElementById('ans-ldr').style.backgroundColor = '';
 
             const correctV = (currentLDR.vs * (currentLDR.r2 / (currentLDR.r1 + currentLDR.r2))).toFixed(2);
             document.getElementById('ans-ldr').value = correctV;
@@ -660,22 +720,26 @@
             document.getElementById('op-rin-txt').textContent = 'Rin: ' + currentOpAmp.rin + 'k';
             document.getElementById('op-rf-txt').textContent = 'Rf: ' + currentOpAmp.rf + 'k';
             document.getElementById('feedback-opamp').style.display = 'none';
-            document.getElementById('ans-opamp').value = '';
+            clearInputFeedback('ans-opamp');
         }
         function checkOpAmp() {
             if (solvedState.opamp) return;
             const userAns = parseFloat(document.getElementById('ans-opamp').value);
-            if(isNaN(userAns)) return;
+            if(isNaN(userAns)) return alert("Please enter a number.");
             
             scores.opamp.attempts++;
             const correctVout = -currentOpAmp.vin * (currentOpAmp.rf / currentOpAmp.rin);
             if (Math.abs(userAns - correctVout) < 0.2) {
+                setInputFeedback('ans-opamp', true);
                 scores.opamp.correct++;
                 solvedState.opamp = true;
                 document.getElementById('btn-check-opamp').disabled = true;
                 document.getElementById('btn-reveal-opamp').disabled = true;
                 showFeedback('feedback-opamp', true, `Correct!`);
-            } else showFeedback('feedback-opamp', false, "Incorrect. Remember this is an INVERTING amplifier. Gain = -(Rf / Rin). Your answer should be negative!");
+            } else {
+                setInputFeedback('ans-opamp', false);
+                showFeedback('feedback-opamp', false, "Incorrect. Check your calculations and try again!");
+            }
             updateScoreboard();
         }
         function revealOpAmp() {
@@ -683,6 +747,8 @@
             solvedState.opamp = true;
             document.getElementById('btn-check-opamp').disabled = true;
             document.getElementById('btn-reveal-opamp').disabled = true;
+            document.getElementById('ans-opamp').style.borderColor = '';
+            document.getElementById('ans-opamp').style.backgroundColor = '';
 
             const correctVout = (-currentOpAmp.vin * (currentOpAmp.rf / currentOpAmp.rin)).toFixed(2);
             document.getElementById('ans-opamp').value = correctVout;
@@ -707,23 +773,27 @@
             document.getElementById('log-b-txt').textContent = 'B: ' + currentLogic.b;
             document.getElementById('log-c-txt').textContent = 'C: ' + currentLogic.c;
             document.getElementById('feedback-logic').style.display = 'none';
-            document.getElementById('ans-logic').value = '';
+            clearInputFeedback('ans-logic');
         }
         function checkLogic() {
             if (solvedState.logic) return;
             const userAns = parseInt(document.getElementById('ans-logic').value);
-            if(isNaN(userAns)) return;
+            if(isNaN(userAns)) return alert("Please enter 0 or 1.");
             
             scores.logic.attempts++;
             const x = (currentLogic.a && currentLogic.b) ? 1 : 0;
             const correctY = (currentLogic.c || x) ? 1 : 0;
             if (userAns === correctY) {
+                setInputFeedback('ans-logic', true);
                 scores.logic.correct++;
                 solvedState.logic = true;
                 document.getElementById('btn-check-logic').disabled = true;
                 document.getElementById('btn-reveal-logic').disabled = true;
                 showFeedback('feedback-logic', true, `Correct!`);
-            } else showFeedback('feedback-logic', false, "Incorrect. Evaluate the AND gate first, then pass that result into the OR gate with C.");
+            } else {
+                setInputFeedback('ans-logic', false);
+                showFeedback('feedback-logic', false, "Incorrect. Try again!");
+            }
             updateScoreboard();
         }
         function revealLogic() {
@@ -731,6 +801,8 @@
             solvedState.logic = true;
             document.getElementById('btn-check-logic').disabled = true;
             document.getElementById('btn-reveal-logic').disabled = true;
+            document.getElementById('ans-logic').style.borderColor = '';
+            document.getElementById('ans-logic').style.backgroundColor = '';
 
             const x = (currentLogic.a && currentLogic.b) ? 1 : 0;
             const correctY = (currentLogic.c || x) ? 1 : 0;
