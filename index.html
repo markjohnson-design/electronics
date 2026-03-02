@@ -13,8 +13,34 @@
             margin: 0 auto;
             padding: 20px;
         }
-        h1 { text-align: center; color: #2c3e50; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
         
+        /* Scoreboard Styles */
+        .scoreboard {
+            background: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 2px solid #3182ce;
+        }
+        .score-text { font-size: 1.5rem; font-weight: bold; color: #2c3e50; margin: 0; }
+        .score-numbers { color: #3182ce; }
+        .download-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .download-btn:hover { background: #38a169; }
+
         /* Tab Navigation */
         .tab-nav {
             display: flex;
@@ -83,6 +109,7 @@
             margin-bottom: 10px;
         }
         .action-btn:hover { background: #2b6cb0; }
+        .action-btn:disabled { background: #a0aec0; cursor: not-allowed; }
         
         .feedback {
             margin-top: 15px;
@@ -101,6 +128,11 @@
 <body>
 
     <h1>Abingdon Electronics Revision</h1>
+
+    <div class="scoreboard">
+        <p class="score-text">Score: <span id="score-display" class="score-numbers">0 / 0</span></p>
+        <button class="download-btn" onclick="downloadScore()">⬇ Download Score</button>
+    </div>
 
     <div class="tab-nav">
         <button class="tab-btn active" onclick="openTab(event, 'tab-led')">LED Resistor</button>
@@ -139,14 +171,14 @@
                 <input type="number" id="ans-led" placeholder="e.g. 330">
             </div>
         </div>
-        <button class="action-btn" onclick="checkLED()">Check Answer</button>
+        <button class="action-btn" id="btn-check-led" onclick="checkLED()">Check Answer</button>
         <button class="action-btn" style="background: #718096;" onclick="generateLED()">New Problem</button>
         <div id="feedback-led" class="feedback"></div>
     </div>
 
     <div id="tab-ldr" class="tab-content">
         <h2>Light Sensor Voltage</h2>
-        <p>Adjust the light level and calculate the resulting Vout. (Assume the LDR drops to 1kΩ in bright light and 10kΩ in dark).</p>
+        <p>Adjust the light level and calculate the resulting Vout.</p>
         
         <div class="diagram-box">
             <svg viewBox="0 0 400 300" width="400" height="300" stroke="#2d3748" stroke-width="2" fill="none">
@@ -178,7 +210,7 @@
                 <input type="number" id="ans-ldr" step="0.1" placeholder="e.g. 3.4">
             </div>
         </div>
-        <button class="action-btn" onclick="checkLDR()">Check Answer</button>
+        <button class="action-btn" id="btn-check-ldr" onclick="checkLDR()">Check Answer</button>
         <button class="action-btn" style="background: #718096;" onclick="generateLDR()">New Fixed Resistor</button>
         <div id="feedback-ldr" class="feedback"></div>
     </div>
@@ -192,14 +224,12 @@
                 <polygon points="180,60 180,140 280,100" fill="white"/>
                 <text x="190" y="90" stroke="none" fill="#2d3748" font-weight="bold">-</text>
                 <text x="190" y="125" stroke="none" fill="#2d3748" font-weight="bold">+</text>
-                
                 <line x1="50" y1="85" x2="80" y2="85"/>
                 <text x="20" y="90" stroke="none" fill="#2d3748" font-weight="bold" id="op-vin-txt">0.5V</text>
                 <rect x="80" y="70" width="40" height="30" fill="white"/>
                 <text x="80" y="60" stroke="none" fill="#3182ce" id="op-rin-txt">Rin: 10k</text>
                 <line x1="120" y1="85" x2="180" y2="85"/>
                 <circle cx="150" cy="85" r="3" fill="#2d3748"/>
-                
                 <line x1="150" y1="85" x2="150" y2="30"/>
                 <line x1="150" y1="30" x2="180" y2="30"/>
                 <rect x="180" y="15" width="60" height="30" fill="white"/>
@@ -207,12 +237,10 @@
                 <line x1="240" y1="30" x2="320" y2="30"/>
                 <line x1="320" y1="30" x2="320" y2="100"/>
                 <circle cx="320" cy="100" r="3" fill="#2d3748"/>
-                
                 <line x1="140" y1="120" x2="180" y2="120"/>
                 <line x1="140" y1="120" x2="140" y2="150"/>
                 <line x1="130" y1="150" x2="150" y2="150"/>
                 <line x1="135" y1="155" x2="145" y2="155"/>
-                
                 <line x1="280" y1="100" x2="360" y2="100"/>
                 <text x="370" y="105" stroke="none" fill="#e53e3e" font-weight="bold">Vout = ?</text>
             </svg>
@@ -221,10 +249,10 @@
         <div class="controls">
             <div class="control-group">
                 <label>Your Answer for Vout (V):</label>
-                <input type="number" id="ans-opamp" step="0.1" placeholder="Remember the polarity!">
+                <input type="number" id="ans-opamp" step="0.1" placeholder="Remember polarity!">
             </div>
         </div>
-        <button class="action-btn" onclick="checkOpAmp()">Check Answer</button>
+        <button class="action-btn" id="btn-check-opamp" onclick="checkOpAmp()">Check Answer</button>
         <button class="action-btn" style="background: #718096;" onclick="generateOpAmp()">New Problem</button>
         <div id="feedback-opamp" class="feedback"></div>
     </div>
@@ -241,17 +269,13 @@
                 <line x1="60" y1="85" x2="120" y2="85"/>
                 <text x="40" y="60" stroke="none" fill="#3182ce" font-weight="bold" id="log-a-txt">A: 1</text>
                 <text x="40" y="90" stroke="none" fill="#3182ce" font-weight="bold" id="log-b-txt">B: 0</text>
-                
                 <path d="M 240 80 Q 260 80 280 110 Q 260 140 240 140 Q 255 110 240 80 Z" fill="white"/>
                 <text x="250" y="115" stroke="none" fill="#2d3748" font-size="12">OR</text>
-                
                 <line x1="180" y1="70" x2="220" y2="70"/>
                 <line x1="220" y1="70" x2="220" y2="95"/>
                 <line x1="220" y1="95" x2="245" y2="95"/>
-                
                 <line x1="60" y1="125" x2="245" y2="125"/>
                 <text x="40" y="130" stroke="none" fill="#3182ce" font-weight="bold" id="log-c-txt">C: 1</text>
-                
                 <line x1="280" y1="110" x2="340" y2="110"/>
                 <text x="350" y="115" stroke="none" fill="#e53e3e" font-weight="bold">Y = ?</text>
             </svg>
@@ -263,37 +287,59 @@
                 <input type="number" id="ans-logic" min="0" max="1" placeholder="0 or 1">
             </div>
         </div>
-        <button class="action-btn" onclick="checkLogic()">Check Answer</button>
+        <button class="action-btn" id="btn-check-logic" onclick="checkLogic()">Check Answer</button>
         <button class="action-btn" style="background: #718096;" onclick="generateLogic()">Randomize Inputs</button>
         <div id="feedback-logic" class="feedback"></div>
     </div>
 
     <script>
-        // --- TAB NAVIGATION LOGIC ---
+        // --- GLOBAL SCORING VARIABLES ---
+        let totalScore = 0;
+        let totalAttempts = 0;
+        
+        // Track if the current problem on a tab has been solved (prevents point farming)
+        let solved = {
+            led: false,
+            ldr: false,
+            opamp: false,
+            logic: false
+        };
+
+        function updateScoreboard() {
+            document.getElementById('score-display').textContent = `${totalScore} / ${totalAttempts}`;
+        }
+
+        function downloadScore() {
+            const date = new Date().toLocaleDateString();
+            const text = `Abingdon Electronics - Revision Quiz Results\nDate: ${date}\nScore: ${totalScore} out of ${totalAttempts} correct.`;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `Electronics_Score_${date.replace(/\//g, '-')}.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+        }
+
+        // --- TAB NAVIGATION ---
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < contents.length; i++) {
-                contents[i].classList.remove("active");
-            }
+            for (let i = 0; i < contents.length; i++) { contents[i].classList.remove("active"); }
             const buttons = document.getElementsByClassName("tab-btn");
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove("active");
-            }
+            for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove("active"); }
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
 
-        // --- HELPER FUNCTION FOR FEEDBACK ---
         function showFeedback(id, isCorrect, message) {
             const el = document.getElementById(id);
             el.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
-            el.textContent = message;
+            el.innerHTML = message; // Using innerHTML in case we want formatting
         }
 
         // --- TAB 1: LED LOGIC ---
         let currentLED = {};
         function generateLED() {
-            // Randomize Vsupply (5 to 12), Vf (1.8 to 3.2), Target I (10 to 20mA)
+            solved.led = false;
+            document.getElementById('btn-check-led').disabled = false;
             currentLED.vs = Math.floor(Math.random() * 8) + 5; 
             currentLED.vf = (Math.random() * 1.4 + 1.8).toFixed(1);
             currentLED.i = Math.floor(Math.random() * 11) + 10;
@@ -305,49 +351,73 @@
             document.getElementById('ans-led').value = '';
         }
         function checkLED() {
+            if (solved.led) return; 
+            
             const userAns = parseFloat(document.getElementById('ans-led').value);
-            // Math: R = (Vs - Vf) / I(in Amps)
+            if(isNaN(userAns)) return alert("Please enter a number.");
+
+            totalAttempts++;
             const correctR = ((currentLED.vs - currentLED.vf) / (currentLED.i / 1000));
             
-            if (Math.abs(userAns - correctR) < 5) { // Allow tiny rounding tolerance
+            if (Math.abs(userAns - correctR) < 5) {
+                totalScore++;
+                solved.led = true;
+                document.getElementById('btn-check-led').disabled = true;
                 showFeedback('feedback-led', true, `Correct! ${currentLED.vs}V - ${currentLED.vf}V = ${(currentLED.vs - currentLED.vf).toFixed(1)}V across the resistor. R = V/I = ${(currentLED.vs - currentLED.vf).toFixed(1)} / 0.${currentLED.i}A = ${correctR.toFixed(0)}Ω.`);
             } else {
-                showFeedback('feedback-led', false, "Incorrect. Remember: Subtract Vf from the supply voltage first, then use Ohm's Law (V=IR), converting mA to Amps!");
+                showFeedback('feedback-led', false, "Incorrect. Subtract Vf from the supply voltage, then use Ohm's Law (V=IR), converting mA to Amps!");
             }
+            updateScoreboard();
         }
 
         // --- TAB 2: LDR LOGIC ---
         let currentLDR = { vs: 5, r1: 4.7 };
         function generateLDR() {
+            solved.ldr = false;
+            document.getElementById('btn-check-ldr').disabled = false;
             currentLDR.vs = [5, 9, 12][Math.floor(Math.random() * 3)];
             currentLDR.r1 = [1, 2.2, 4.7, 10][Math.floor(Math.random() * 4)];
             document.getElementById('ldr-vs-txt').textContent = currentLDR.vs + 'V';
             document.getElementById('ldr-r1-txt').textContent = 'R1: ' + currentLDR.r1 + 'kΩ';
             document.getElementById('feedback-ldr').style.display = 'none';
             document.getElementById('ans-ldr').value = '';
+            document.getElementById('ldr-slider').value = 1; // Reset slider
             updateLDR();
         }
         function updateLDR() {
             const slider = document.getElementById('ldr-slider').value;
-            // Map slider 1-10 to resistance 10k down to 1k
             currentLDR.r2 = 11 - slider; 
             document.getElementById('ldr-r2-txt').textContent = 'LDR: ' + currentLDR.r2 + 'kΩ';
+            // Allow them to guess again if they change the slider
+            solved.ldr = false;
+            document.getElementById('btn-check-ldr').disabled = false;
+            document.getElementById('feedback-ldr').style.display = 'none';
         }
         function checkLDR() {
+            if (solved.ldr) return;
+
             const userAns = parseFloat(document.getElementById('ans-ldr').value);
-            // Voltage Divider: Vout = Vs * (R2 / (R1 + R2))
+            if(isNaN(userAns)) return alert("Please enter a number.");
+
+            totalAttempts++;
             const correctV = currentLDR.vs * (currentLDR.r2 / (currentLDR.r1 + currentLDR.r2));
             
             if (Math.abs(userAns - correctV) < 0.2) {
+                totalScore++;
+                solved.ldr = true;
+                document.getElementById('btn-check-ldr').disabled = true;
                 showFeedback('feedback-ldr', true, `Correct! Vout = ${currentLDR.vs}V * (${currentLDR.r2}k / ${currentLDR.r1 + currentLDR.r2}k) = ${correctV.toFixed(2)}V.`);
             } else {
                 showFeedback('feedback-ldr', false, "Incorrect. Use the voltage divider formula: Vout = Vin × [ R_bottom / (R_top + R_bottom) ].");
             }
+            updateScoreboard();
         }
 
         // --- TAB 3: OP-AMP LOGIC ---
         let currentOpAmp = {};
         function generateOpAmp() {
+            solved.opamp = false;
+            document.getElementById('btn-check-opamp').disabled = false;
             currentOpAmp.vin = (Math.random() * 0.9 + 0.1).toFixed(1);
             currentOpAmp.rin = [1, 5, 10][Math.floor(Math.random() * 3)];
             currentOpAmp.rf = [10, 22, 47, 100][Math.floor(Math.random() * 4)];
@@ -359,20 +429,30 @@
             document.getElementById('ans-opamp').value = '';
         }
         function checkOpAmp() {
+            if (solved.opamp) return;
+
             const userAns = parseFloat(document.getElementById('ans-opamp').value);
-            // Inverting Gain = -Rf/Rin
+            if(isNaN(userAns)) return alert("Please enter a number.");
+
+            totalAttempts++;
             const correctVout = -currentOpAmp.vin * (currentOpAmp.rf / currentOpAmp.rin);
             
             if (Math.abs(userAns - correctVout) < 0.2) {
+                totalScore++;
+                solved.opamp = true;
+                document.getElementById('btn-check-opamp').disabled = true;
                 showFeedback('feedback-opamp', true, `Correct! Gain = -(${currentOpAmp.rf} / ${currentOpAmp.rin}) = -${currentOpAmp.rf/currentOpAmp.rin}. Vout = Gain × Vin = ${correctVout.toFixed(2)}V.`);
             } else {
                 showFeedback('feedback-opamp', false, "Incorrect. Remember this is an INVERTING amplifier. Gain = -(Rf / Rin). Your answer should be negative!");
             }
+            updateScoreboard();
         }
 
         // --- TAB 4: LOGIC GATES ---
         let currentLogic = {};
         function generateLogic() {
+            solved.logic = false;
+            document.getElementById('btn-check-logic').disabled = false;
             currentLogic.a = Math.round(Math.random());
             currentLogic.b = Math.round(Math.random());
             currentLogic.c = Math.round(Math.random());
@@ -384,16 +464,24 @@
             document.getElementById('ans-logic').value = '';
         }
         function checkLogic() {
+            if (solved.logic) return;
+
             const userAns = parseInt(document.getElementById('ans-logic').value);
-            // X = A AND B. Y = C OR X.
+            if(isNaN(userAns)) return alert("Please enter a number.");
+
+            totalAttempts++;
             const x = (currentLogic.a && currentLogic.b) ? 1 : 0;
             const correctY = (currentLogic.c || x) ? 1 : 0;
             
             if (userAns === correctY) {
+                totalScore++;
+                solved.logic = true;
+                document.getElementById('btn-check-logic').disabled = true;
                 showFeedback('feedback-logic', true, `Correct! A AND B = ${x}. Then, ${currentLogic.c} OR ${x} = ${correctY}.`);
             } else {
                 showFeedback('feedback-logic', false, "Incorrect. Evaluate the AND gate first, then pass that result into the OR gate with C.");
             }
+            updateScoreboard();
         }
 
         // Initialize all tabs on load
