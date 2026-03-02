@@ -244,7 +244,9 @@
                 <line x1="150" y1="160" x2="150" y2="220" />
                 <text x="160" y="70" fill="#001f3f" stroke="none">I₁ = <tspan id="mixed-i1">2mA</tspan></text>
                 <line x1="120" y1="160" x2="120" y2="100" marker-end="url(#arrow-up)" stroke-width="1"/>
-                <text x="75" y="135" fill="#001f3f" stroke="none">V₁ = <tspan id="mixed-v1">1V</tspan></text>
+                
+                <text x="50" y="135" fill="#001f3f" stroke="none">V₁ = <tspan id="mixed-v1">1V</tspan></text>
+                
                 <line x1="330" y1="50" x2="330" y2="100" marker-start="url(#arrow-down)"/>
                 <rect x="320" y="100" width="20" height="60" fill="white" />
                 <line x1="330" y1="160" x2="330" y2="220" />
@@ -350,7 +352,7 @@
     <div id="tab-opamp" class="tab-content">
         <h2>Inverting Amplifier</h2>
         <div class="diagram-box">
-            <svg viewBox="0 0 400 200" width="400" height="200" stroke="#001f3f" stroke-width="2" fill="none">
+            <svg viewBox="0 -20 400 220" width="400" height="200" stroke="#001f3f" stroke-width="2" fill="none">
                 <polygon points="180,60 180,140 280,100" fill="white"/>
                 <text x="190" y="90" stroke="none" fill="#001f3f" font-weight="bold">-</text>
                 <text x="190" y="125" stroke="none" fill="#001f3f" font-weight="bold">+</text>
@@ -362,8 +364,10 @@
                 <circle cx="150" cy="85" r="3" fill="#001f3f"/>
                 <line x1="150" y1="85" x2="150" y2="30"/>
                 <line x1="150" y1="30" x2="180" y2="30"/>
+                
                 <rect x="180" y="15" width="60" height="30" fill="white"/>
-                <text x="180" y="10" stroke="none" fill="#001f3f" id="op-rf-txt">Rf: 100k</text>
+                <text x="180" y="8" stroke="none" fill="#001f3f" id="op-rf-txt">Rf: 100k</text>
+                
                 <line x1="240" y1="30" x2="320" y2="30"/>
                 <line x1="320" y1="30" x2="320" y2="100"/>
                 <circle cx="320" cy="100" r="3" fill="#001f3f"/>
@@ -371,8 +375,9 @@
                 <line x1="140" y1="120" x2="140" y2="150"/>
                 <line x1="130" y1="150" x2="150" y2="150"/>
                 <line x1="135" y1="155" x2="145" y2="155"/>
-                <line x1="280" y1="100" x2="360" y2="100"/>
-                <text x="370" y="105" stroke="none" fill="#B30059" font-weight="bold">Vout = ?</text>
+                
+                <line x1="280" y1="100" x2="345" y2="100"/>
+                <text x="350" y="105" stroke="none" fill="#B30059" font-weight="bold">Vout = ?</text>
             </svg>
         </div>
         <div class="controls">
@@ -393,17 +398,21 @@
             <svg viewBox="0 0 400 200" width="400" height="200" stroke="#001f3f" stroke-width="2" fill="none">
                 <path d="M 120 40 L 150 40 A 30 30 0 0 1 150 100 L 120 100 Z" fill="white"/>
                 <text x="130" y="75" stroke="none" fill="#001f3f" font-size="12">AND</text>
-                <line x1="60" y1="55" x2="120" y2="55"/>
-                <line x1="60" y1="85" x2="120" y2="85"/>
-                <text x="40" y="60" stroke="none" fill="#001f3f" font-weight="bold" id="log-a-txt">A: 1</text>
-                <text x="40" y="90" stroke="none" fill="#001f3f" font-weight="bold" id="log-b-txt">B: 0</text>
+                
+                <line x1="75" y1="55" x2="120" y2="55"/>
+                <line x1="75" y1="85" x2="120" y2="85"/>
+                <text x="25" y="60" stroke="none" fill="#001f3f" font-weight="bold" id="log-a-txt">A: 1</text>
+                <text x="25" y="90" stroke="none" fill="#001f3f" font-weight="bold" id="log-b-txt">B: 0</text>
+                
                 <path d="M 240 80 Q 260 80 280 110 Q 260 140 240 140 Q 255 110 240 80 Z" fill="white"/>
                 <text x="250" y="115" stroke="none" fill="#001f3f" font-size="12">OR</text>
                 <line x1="180" y1="70" x2="220" y2="70"/>
                 <line x1="220" y1="70" x2="220" y2="95"/>
                 <line x1="220" y1="95" x2="245" y2="95"/>
-                <line x1="60" y1="125" x2="245" y2="125"/>
-                <text x="40" y="130" stroke="none" fill="#001f3f" font-weight="bold" id="log-c-txt">C: 1</text>
+                
+                <line x1="75" y1="125" x2="245" y2="125"/>
+                <text x="25" y="130" stroke="none" fill="#001f3f" font-weight="bold" id="log-c-txt">C: 1</text>
+                
                 <line x1="280" y1="110" x2="340" y2="110"/>
                 <text x="350" y="115" stroke="none" fill="#B30059" font-weight="bold">Y = ?</text>
             </svg>
@@ -503,18 +512,16 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // --- BUG FIX: Added el.style.display = '' to clear the inline hiding ---
         function showFeedback(id, isCorrect, message) {
             const el = document.getElementById(id);
-            el.style.display = ''; // Clear inline 'none' style!
+            el.style.display = ''; 
             el.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
             el.innerHTML = message;
         }
 
-        // --- BUG FIX: Added el.style.display = '' to clear the inline hiding ---
         function showSolution(id, message) {
             const el = document.getElementById(id);
-            el.style.display = ''; // Clear inline 'none' style!
+            el.style.display = ''; 
             el.className = 'feedback solution';
             el.innerHTML = `<h3>Step-by-Step Worked Solution</h3>${message}`;
             el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -555,7 +562,7 @@
             document.getElementById('mixed-i1').textContent = currentMixed.i1 + 'mA';
             document.getElementById('mixed-i2').textContent = currentMixed.i2 + 'mA';
             
-            document.getElementById('feedback-mixed').style.display = 'none'; // Re-hide on new problem
+            document.getElementById('feedback-mixed').style.display = 'none';
             ['ans-mixed-v2', 'ans-mixed-i3', 'ans-mixed-v3', 'ans-mixed-i4'].forEach(clearInputFeedback);
         }
         function checkMixed() {
@@ -643,7 +650,7 @@
             document.getElementById('led-vs-txt').textContent = currentLED.vs + 'V';
             document.getElementById('led-vf-txt').textContent = 'Vf: ' + currentLED.vf + 'V';
             document.getElementById('led-i-txt').textContent = 'Target: ' + currentLED.i + 'mA';
-            document.getElementById('feedback-led').style.display = 'none'; // Re-hide
+            document.getElementById('feedback-led').style.display = 'none'; 
             clearInputFeedback('ans-led');
         }
         function checkLED() {
@@ -701,7 +708,7 @@
             currentLDR.r1 = [1, 2.2, 4.7, 10][Math.floor(Math.random() * 4)];
             document.getElementById('ldr-vs-txt').textContent = currentLDR.vs + 'V';
             document.getElementById('ldr-r1-txt').textContent = 'R1: ' + currentLDR.r1 + 'kΩ';
-            document.getElementById('feedback-ldr').style.display = 'none'; // Re-hide
+            document.getElementById('feedback-ldr').style.display = 'none'; 
             document.getElementById('ldr-slider').value = 1;
             clearInputFeedback('ans-ldr');
             updateLDR();
@@ -777,7 +784,7 @@
             document.getElementById('op-vin-txt').textContent = currentOpAmp.vin + 'V';
             document.getElementById('op-rin-txt').textContent = 'Rin: ' + currentOpAmp.rin + 'k';
             document.getElementById('op-rf-txt').textContent = 'Rf: ' + currentOpAmp.rf + 'k';
-            document.getElementById('feedback-opamp').style.display = 'none'; // Re-hide
+            document.getElementById('feedback-opamp').style.display = 'none'; 
             clearInputFeedback('ans-opamp');
         }
         function checkOpAmp() {
@@ -836,7 +843,7 @@
             document.getElementById('log-a-txt').textContent = 'A: ' + currentLogic.a;
             document.getElementById('log-b-txt').textContent = 'B: ' + currentLogic.b;
             document.getElementById('log-c-txt').textContent = 'C: ' + currentLogic.c;
-            document.getElementById('feedback-logic').style.display = 'none'; // Re-hide
+            document.getElementById('feedback-logic').style.display = 'none'; 
             clearInputFeedback('ans-logic');
         }
         function checkLogic() {
