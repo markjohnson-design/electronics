@@ -3,267 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WJEC Mixed Circuit Generator</title>
+    <title>Abingdon Electronics - Revision</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f8;
             color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
         }
-        .container {
+        h1 { text-align: center; color: #2c3e50; }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: #e2e8f0;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #4a5568;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .tab-btn:hover { background: #cbd5e0; }
+        .tab-btn.active { background: white; color: #2b6cb0; border-bottom: 3px solid #2b6cb0; }
+        
+        /* Content Areas */
+        .tab-content {
+            display: none;
             background: white;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 1.5rem;
-            margin-top: 0;
-        }
-        .diagram-container {
-            background: #ffffff;
+        .tab-content.active { display: block; }
+        
+        /* Layout Elements */
+        .diagram-box {
             border: 2px solid #e2e8f0;
             border-radius: 8px;
-            padding: 20px 0;
+            padding: 20px;
             margin-bottom: 20px;
             text-align: center;
-            overflow: visible;
+            background: #fff;
         }
-        .controls-grid {
+        .controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 20px;
-        }
-        .control-group {
             background: #f8fafc;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        label {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #4a5568;
-            font-size: 0.9rem;
-        }
-        input[type=range] { width: 100%; cursor: pointer; }
-        .val-display { color: #3182ce; }
-        
-        .answers-box {
-            background: #edf2f7;
             padding: 15px;
             border-radius: 8px;
-            border: 1px dashed #a0aec0;
         }
-        .answers-box h3 { margin-top: 0; color: #2d3748; font-size: 1.1rem;}
-        .answer-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .ans-item { font-size: 1.1rem; }
-        .ans-val { font-weight: bold; color: #e53e3e; }
+        .control-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; color: #4a5568; }
+        input[type="number"], input[type="range"] { padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; }
         
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #3182ce;
+        .action-btn {
+            background: #3182ce;
             color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 6px;
-            font-size: 1rem;
             cursor: pointer;
-            margin-bottom: 15px;
+            font-size: 1rem;
             font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
         }
-        button:hover { background-color: #2b6cb0; }
-        .hidden { display: none; }
+        .action-btn:hover { background: #2b6cb0; }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .feedback.correct { background: #c6f6d5; color: #22543d; display: block; }
+        .feedback.incorrect { background: #fed7d7; color: #822727; display: block; }
+
+        svg { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>WJEC Problem Generator</h1>
+    <h1>Abingdon Electronics Revision</h1>
 
-        <div class="diagram-container">
-            <svg viewBox="0 0 450 400" width="100%" height="300" xmlns="http://www.w3.org/2000/svg" stroke="#2d3748" stroke-width="2" fill="none">
-                <defs>
-                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d3748" stroke="none"/>
-                    </marker>
-                    <marker id="arrow-up" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="270">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d3748" stroke="none"/>
-                    </marker>
-                    <marker id="arrow-down" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="90">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d3748" stroke="none"/>
-                    </marker>
-                </defs>
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-led')">LED Resistor</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-ldr')">LDR Divider</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-opamp')">Op-Amp Gain</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-logic')">Logic Gates</button>
+    </div>
 
-                <circle cx="70" cy="50" r="4" fill="white" stroke="#2d3748" stroke-width="2"/>
-                <text x="35" y="55" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold" id="svg-vsupply">6 V</text>
-                <line x1="74" y1="50" x2="330" y2="50" />
-                
-                <circle cx="150" cy="50" r="4" fill="#2d3748" />
-                <circle cx="240" cy="220" r="4" fill="#2d3748" />
-
-                <line x1="150" y1="50" x2="150" y2="100" marker-start="url(#arrow-down)" />
-                <rect x="140" y="100" width="20" height="60" fill="white" />
-                <line x1="150" y1="160" x2="150" y2="220" />
-                
-                <text x="160" y="70" fill="#2d3748" stroke="none" font-size="14" font-family="sans-serif">I₁ = <tspan id="svg-i1">2mA</tspan></text>
-                <line x1="120" y1="160" x2="120" y2="100" marker-end="url(#arrow-up)" stroke-width="1"/>
-                <text x="75" y="135" fill="#2d3748" stroke="none" font-size="14" font-family="sans-serif">V₁ = <tspan id="svg-v1">1V</tspan></text>
-
-                <line x1="330" y1="50" x2="330" y2="100" marker-start="url(#arrow-down)"/>
-                <rect x="320" y="100" width="20" height="60" fill="white" />
-                <line x1="330" y1="160" x2="330" y2="220" />
-                
-                <text x="340" y="70" fill="#2d3748" stroke="none" font-size="14" font-family="sans-serif">I₂ = <tspan id="svg-i2">6mA</tspan></text>
-                <line x1="350" y1="160" x2="350" y2="100" marker-end="url(#arrow-up)" stroke-width="1"/>
-                <text x="360" y="135" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">V₂ = <tspan id="svg-v2">?</tspan></text>
-
-                <line x1="150" y1="220" x2="330" y2="220" />
-
-                <line x1="240" y1="220" x2="240" y2="270" marker-start="url(#arrow-down)"/>
-                <rect x="230" y="270" width="20" height="60" fill="white" />
-                <line x1="240" y1="330" x2="240" y2="380" />
-
-                <text x="250" y="245" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">I₃ = <tspan id="svg-i3">?</tspan></text>
-                <line x1="260" y1="330" x2="260" y2="270" marker-end="url(#arrow-up)" stroke-width="1"/>
-                <text x="270" y="305" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">V₃ = <tspan id="svg-v3">?</tspan></text>
-
-                <line x1="240" y1="380" x2="74" y2="380" />
-                <line x1="170" y1="380" x2="150" y2="380" marker-end="url(#arrow)" stroke-width="2"/> <circle cx="70" cy="380" r="4" fill="white" stroke="#2d3748" stroke-width="2"/>
-                
-                <text x="35" y="385" fill="#2d3748" stroke="none" font-size="16" font-family="sans-serif" font-weight="bold">0 V</text>
-                <text x="145" y="370" fill="#e53e3e" stroke="none" font-size="14" font-family="sans-serif" font-weight="bold" class="ans-text">I₄ = <tspan id="svg-i4">?</tspan></text>
-
+    <div id="tab-led" class="tab-content active">
+        <h2>Calculate the Protective Resistor</h2>
+        <p>Calculate the exact resistor value needed to protect the LED given the supply and forward voltage.</p>
+        
+        <div class="diagram-box">
+            <svg viewBox="0 0 400 200" width="400" height="200" stroke="#2d3748" stroke-width="2" fill="none">
+                <circle cx="50" cy="100" r="20" fill="white"/>
+                <text x="50" y="105" text-anchor="middle" stroke="none" fill="#2d3748" font-weight="bold" id="led-vs-txt">9V</text>
+                <line x1="70" y1="100" x2="120" y2="100"/>
+                <line x1="180" y1="100" x2="250" y2="100"/>
+                <line x1="310" y1="100" x2="350" y2="100"/>
+                <line x1="350" y1="100" x2="350" y2="150"/>
+                <line x1="350" y1="150" x2="50" y2="150"/>
+                <line x1="50" y1="150" x2="50" y2="120"/>
+                <rect x="120" y="85" width="60" height="30" fill="white"/>
+                <text x="150" y="75" text-anchor="middle" stroke="none" fill="#e53e3e" font-weight="bold">R = ?</text>
+                <polygon points="250,85 250,115 290,100" fill="white"/>
+                <line x1="290" y1="85" x2="290" y2="115"/>
+                <circle cx="270" cy="100" r="25"/>
+                <text x="270" y="65" text-anchor="middle" stroke="none" fill="#2d3748" id="led-vf-txt">Vf: 2V</text>
+                <text x="200" y="140" text-anchor="middle" stroke="none" fill="#3182ce" id="led-i-txt">Target Current: 20mA</text>
             </svg>
         </div>
 
-        <div class="controls-grid">
+        <div class="controls">
             <div class="control-group">
-                <label>Supply Voltage <span id="vsupply-val" class="val-display">6V</span></label>
-                <input type="range" id="vsupply" min="2" max="24" value="6" step="1">
-            </div>
-            <div class="control-group">
-                <label>Voltage V₁ <span id="v1-val" class="val-display">1V</span></label>
-                <input type="range" id="v1" min="0.5" max="12" value="1" step="0.5">
-            </div>
-            <div class="control-group">
-                <label>Current I₁ <span id="i1-val" class="val-display">2mA</span></label>
-                <input type="range" id="i1" min="1" max="20" value="2" step="1">
-            </div>
-            <div class="control-group">
-                <label>Current I₂ <span id="i2-val" class="val-display">6mA</span></label>
-                <input type="range" id="i2" min="1" max="20" value="6" step="1">
+                <label>Your Answer for R (Ohms):</label>
+                <input type="number" id="ans-led" placeholder="e.g. 330">
             </div>
         </div>
+        <button class="action-btn" onclick="checkLED()">Check Answer</button>
+        <button class="action-btn" style="background: #718096;" onclick="generateLED()">New Problem</button>
+        <div id="feedback-led" class="feedback"></div>
+    </div>
 
-        <button onclick="toggleAnswers()" id="toggle-btn">Reveal Exam Answers</button>
+    <div id="tab-ldr" class="tab-content">
+        <h2>Light Sensor Voltage</h2>
+        <p>Adjust the light level and calculate the resulting Vout. (Assume the LDR drops to 1kΩ in bright light and 10kΩ in dark).</p>
+        
+        <div class="diagram-box">
+            <svg viewBox="0 0 400 300" width="400" height="300" stroke="#2d3748" stroke-width="2" fill="none">
+                <line x1="100" y1="50" x2="250" y2="50"/>
+                <text x="70" y="55" stroke="none" fill="#2d3748" font-weight="bold" id="ldr-vs-txt">5V</text>
+                <line x1="200" y1="50" x2="200" y2="90"/>
+                <rect x="180" y="90" width="40" height="60" fill="white"/>
+                <text x="230" y="125" stroke="none" fill="#2d3748" id="ldr-r1-txt">R1: 4.7kΩ</text>
+                <line x1="200" y1="150" x2="200" y2="190"/>
+                <circle cx="200" cy="170" r="4" fill="#2d3748"/>
+                <line x1="200" y1="170" x2="280" y2="170"/>
+                <text x="290" y="175" stroke="none" fill="#e53e3e" font-weight="bold">Vout = ?</text>
+                <rect x="180" y="190" width="40" height="60" fill="white"/>
+                <circle cx="200" cy="220" r="35"/>
+                <text x="245" y="225" stroke="none" fill="#3182ce" id="ldr-r2-txt">LDR: 10kΩ</text>
+                <line x1="200" y1="250" x2="200" y2="280"/>
+                <line x1="100" y1="280" x2="250" y2="280"/>
+                <text x="70" y="285" stroke="none" fill="#2d3748" font-weight="bold">0V</text>
+            </svg>
+        </div>
 
-        <div class="answers-box hidden" id="answers-box">
-            <h3>Calculated Answers</h3>
-            <div class="answer-grid">
-                <div class="ans-item">(a) V₂ = <span id="ans-v2" class="ans-val">-</span> V</div>
-                <div class="ans-item">(b) I₃ = <span id="ans-i3" class="ans-val">-</span> mA</div>
-                <div class="ans-item">(c) V₃ = <span id="ans-v3" class="ans-val">-</span> V</div>
-                <div class="ans-item">(d) I₄ = <span id="ans-i4" class="ans-val">-</span> mA</div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Light Level Slider (Changes LDR resistance):</label>
+                <input type="range" id="ldr-slider" min="1" max="10" value="1" oninput="updateLDR()">
+            </div>
+            <div class="control-group">
+                <label>Your Answer for Vout (V):</label>
+                <input type="number" id="ans-ldr" step="0.1" placeholder="e.g. 3.4">
             </div>
         </div>
+        <button class="action-btn" onclick="checkLDR()">Check Answer</button>
+        <button class="action-btn" style="background: #718096;" onclick="generateLDR()">New Fixed Resistor</button>
+        <div id="feedback-ldr" class="feedback"></div>
+    </div>
+
+    <div id="tab-opamp" class="tab-content">
+        <h2>Inverting Amplifier</h2>
+        <p>Calculate the output voltage given the input voltage and resistor ratio.</p>
+        
+        <div class="diagram-box">
+            <svg viewBox="0 0 400 200" width="400" height="200" stroke="#2d3748" stroke-width="2" fill="none">
+                <polygon points="180,60 180,140 280,100" fill="white"/>
+                <text x="190" y="90" stroke="none" fill="#2d3748" font-weight="bold">-</text>
+                <text x="190" y="125" stroke="none" fill="#2d3748" font-weight="bold">+</text>
+                
+                <line x1="50" y1="85" x2="80" y2="85"/>
+                <text x="20" y="90" stroke="none" fill="#2d3748" font-weight="bold" id="op-vin-txt">0.5V</text>
+                <rect x="80" y="70" width="40" height="30" fill="white"/>
+                <text x="80" y="60" stroke="none" fill="#3182ce" id="op-rin-txt">Rin: 10k</text>
+                <line x1="120" y1="85" x2="180" y2="85"/>
+                <circle cx="150" cy="85" r="3" fill="#2d3748"/>
+                
+                <line x1="150" y1="85" x2="150" y2="30"/>
+                <line x1="150" y1="30" x2="180" y2="30"/>
+                <rect x="180" y="15" width="60" height="30" fill="white"/>
+                <text x="180" y="10" stroke="none" fill="#3182ce" id="op-rf-txt">Rf: 100k</text>
+                <line x1="240" y1="30" x2="320" y2="30"/>
+                <line x1="320" y1="30" x2="320" y2="100"/>
+                <circle cx="320" cy="100" r="3" fill="#2d3748"/>
+                
+                <line x1="140" y1="120" x2="180" y2="120"/>
+                <line x1="140" y1="120" x2="140" y2="150"/>
+                <line x1="130" y1="150" x2="150" y2="150"/>
+                <line x1="135" y1="155" x2="145" y2="155"/>
+                
+                <line x1="280" y1="100" x2="360" y2="100"/>
+                <text x="370" y="105" stroke="none" fill="#e53e3e" font-weight="bold">Vout = ?</text>
+            </svg>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Your Answer for Vout (V):</label>
+                <input type="number" id="ans-opamp" step="0.1" placeholder="Remember the polarity!">
+            </div>
+        </div>
+        <button class="action-btn" onclick="checkOpAmp()">Check Answer</button>
+        <button class="action-btn" style="background: #718096;" onclick="generateOpAmp()">New Problem</button>
+        <div id="feedback-opamp" class="feedback"></div>
+    </div>
+
+    <div id="tab-logic" class="tab-content">
+        <h2>Combinational Logic</h2>
+        <p>Determine the final output (Y) based on the inputs (1 or 0).</p>
+        
+        <div class="diagram-box">
+            <svg viewBox="0 0 400 200" width="400" height="200" stroke="#2d3748" stroke-width="2" fill="none">
+                <path d="M 120 40 L 150 40 A 30 30 0 0 1 150 100 L 120 100 Z" fill="white"/>
+                <text x="130" y="75" stroke="none" fill="#2d3748" font-size="12">AND</text>
+                <line x1="60" y1="55" x2="120" y2="55"/>
+                <line x1="60" y1="85" x2="120" y2="85"/>
+                <text x="40" y="60" stroke="none" fill="#3182ce" font-weight="bold" id="log-a-txt">A: 1</text>
+                <text x="40" y="90" stroke="none" fill="#3182ce" font-weight="bold" id="log-b-txt">B: 0</text>
+                
+                <path d="M 240 80 Q 260 80 280 110 Q 260 140 240 140 Q 255 110 240 80 Z" fill="white"/>
+                <text x="250" y="115" stroke="none" fill="#2d3748" font-size="12">OR</text>
+                
+                <line x1="180" y1="70" x2="220" y2="70"/>
+                <line x1="220" y1="70" x2="220" y2="95"/>
+                <line x1="220" y1="95" x2="245" y2="95"/>
+                
+                <line x1="60" y1="125" x2="245" y2="125"/>
+                <text x="40" y="130" stroke="none" fill="#3182ce" font-weight="bold" id="log-c-txt">C: 1</text>
+                
+                <line x1="280" y1="110" x2="340" y2="110"/>
+                <text x="350" y="115" stroke="none" fill="#e53e3e" font-weight="bold">Y = ?</text>
+            </svg>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Your Answer for Output Y (0 or 1):</label>
+                <input type="number" id="ans-logic" min="0" max="1" placeholder="0 or 1">
+            </div>
+        </div>
+        <button class="action-btn" onclick="checkLogic()">Check Answer</button>
+        <button class="action-btn" style="background: #718096;" onclick="generateLogic()">Randomize Inputs</button>
+        <div id="feedback-logic" class="feedback"></div>
     </div>
 
     <script>
-        const inputs = ['vsupply', 'v1', 'i1', 'i2'];
-        let showingAnswers = false;
-
-        function updateCircuit() {
-            // 1. Get Values
-            const vsupply = parseFloat(document.getElementById('vsupply').value);
-            const v1 = parseFloat(document.getElementById('v1').value);
-            const i1 = parseFloat(document.getElementById('i1').value);
-            const i2 = parseFloat(document.getElementById('i2').value);
-
-            // Prevent V1 from being higher than Supply Voltage (physically impossible here)
-            if (v1 >= vsupply) {
-                document.getElementById('v1').value = vsupply - 0.5;
-                return updateCircuit(); // Recalculate
+        // --- TAB NAVIGATION LOGIC ---
+        function openTab(evt, tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
             }
-
-            // 2. Calculate Exam Answers (Kirchhoff's Laws)
-            const v2 = v1;                  // Components in parallel share voltage
-            const i3 = i1 + i2;             // Currents combine at the node
-            const v3 = vsupply - v1;        // Remaining voltage drops across series resistor
-            const i4 = i3;                  // Current returning to source equals current through R3
-
-            // 3. Update Input Labels
-            document.getElementById('vsupply-val').textContent = vsupply + 'V';
-            document.getElementById('v1-val').textContent = v1 + 'V';
-            document.getElementById('i1-val').textContent = i1 + 'mA';
-            document.getElementById('i2-val').textContent = i2 + 'mA';
-
-            // 4. Update SVG Knowns
-            document.getElementById('svg-vsupply').textContent = vsupply + ' V';
-            document.getElementById('svg-v1').textContent = v1 + 'V';
-            document.getElementById('svg-i1').textContent = i1 + 'mA';
-            document.getElementById('svg-i2').textContent = i2 + 'mA';
-
-            // 5. Update Answers Box
-            document.getElementById('ans-v2').textContent = v2;
-            document.getElementById('ans-i3').textContent = i3;
-            document.getElementById('ans-v3').textContent = v3;
-            document.getElementById('ans-i4').textContent = i4;
-
-            // 6. Update SVG Answers (if revealed)
-            if (showingAnswers) {
-                document.getElementById('svg-v2').textContent = v2 + 'V';
-                document.getElementById('svg-i3').textContent = i3 + 'mA';
-                document.getElementById('svg-v3').textContent = v3 + 'V';
-                document.getElementById('svg-i4').textContent = i4 + 'mA';
-            } else {
-                document.getElementById('svg-v2').textContent = '?';
-                document.getElementById('svg-i3').textContent = '?';
-                document.getElementById('svg-v3').textContent = '?';
-                document.getElementById('svg-i4').textContent = '?';
+            const buttons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
             }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
         }
 
-        function toggleAnswers() {
-            showingAnswers = !showingAnswers;
-            const box = document.getElementById('answers-box');
-            const btn = document.getElementById('toggle-btn');
+        // --- HELPER FUNCTION FOR FEEDBACK ---
+        function showFeedback(id, isCorrect, message) {
+            const el = document.getElementById(id);
+            el.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+            el.textContent = message;
+        }
+
+        // --- TAB 1: LED LOGIC ---
+        let currentLED = {};
+        function generateLED() {
+            // Randomize Vsupply (5 to 12), Vf (1.8 to 3.2), Target I (10 to 20mA)
+            currentLED.vs = Math.floor(Math.random() * 8) + 5; 
+            currentLED.vf = (Math.random() * 1.4 + 1.8).toFixed(1);
+            currentLED.i = Math.floor(Math.random() * 11) + 10;
             
-            if (showingAnswers) {
-                box.classList.remove('hidden');
-                btn.textContent = 'Hide Exam Answers';
+            document.getElementById('led-vs-txt').textContent = currentLED.vs + 'V';
+            document.getElementById('led-vf-txt').textContent = 'Vf: ' + currentLED.vf + 'V';
+            document.getElementById('led-i-txt').textContent = 'Target Current: ' + currentLED.i + 'mA';
+            document.getElementById('feedback-led').style.display = 'none';
+            document.getElementById('ans-led').value = '';
+        }
+        function checkLED() {
+            const userAns = parseFloat(document.getElementById('ans-led').value);
+            // Math: R = (Vs - Vf) / I(in Amps)
+            const correctR = ((currentLED.vs - currentLED.vf) / (currentLED.i / 1000));
+            
+            if (Math.abs(userAns - correctR) < 5) { // Allow tiny rounding tolerance
+                showFeedback('feedback-led', true, `Correct! ${currentLED.vs}V - ${currentLED.vf}V = ${(currentLED.vs - currentLED.vf).toFixed(1)}V across the resistor. R = V/I = ${(currentLED.vs - currentLED.vf).toFixed(1)} / 0.${currentLED.i}A = ${correctR.toFixed(0)}Ω.`);
             } else {
-                box.classList.add('hidden');
-                btn.textContent = 'Reveal Exam Answers';
+                showFeedback('feedback-led', false, "Incorrect. Remember: Subtract Vf from the supply voltage first, then use Ohm's Law (V=IR), converting mA to Amps!");
             }
-            updateCircuit();
         }
 
-        // Add event listeners
-        inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', updateCircuit);
-        });
+        // --- TAB 2: LDR LOGIC ---
+        let currentLDR = { vs: 5, r1: 4.7 };
+        function generateLDR() {
+            currentLDR.vs = [5, 9, 12][Math.floor(Math.random() * 3)];
+            currentLDR.r1 = [1, 2.2, 4.7, 10][Math.floor(Math.random() * 4)];
+            document.getElementById('ldr-vs-txt').textContent = currentLDR.vs + 'V';
+            document.getElementById('ldr-r1-txt').textContent = 'R1: ' + currentLDR.r1 + 'kΩ';
+            document.getElementById('feedback-ldr').style.display = 'none';
+            document.getElementById('ans-ldr').value = '';
+            updateLDR();
+        }
+        function updateLDR() {
+            const slider = document.getElementById('ldr-slider').value;
+            // Map slider 1-10 to resistance 10k down to 1k
+            currentLDR.r2 = 11 - slider; 
+            document.getElementById('ldr-r2-txt').textContent = 'LDR: ' + currentLDR.r2 + 'kΩ';
+        }
+        function checkLDR() {
+            const userAns = parseFloat(document.getElementById('ans-ldr').value);
+            // Voltage Divider: Vout = Vs * (R2 / (R1 + R2))
+            const correctV = currentLDR.vs * (currentLDR.r2 / (currentLDR.r1 + currentLDR.r2));
+            
+            if (Math.abs(userAns - correctV) < 0.2) {
+                showFeedback('feedback-ldr', true, `Correct! Vout = ${currentLDR.vs}V * (${currentLDR.r2}k / ${currentLDR.r1 + currentLDR.r2}k) = ${correctV.toFixed(2)}V.`);
+            } else {
+                showFeedback('feedback-ldr', false, "Incorrect. Use the voltage divider formula: Vout = Vin × [ R_bottom / (R_top + R_bottom) ].");
+            }
+        }
 
-        // Initial run
-        updateCircuit();
+        // --- TAB 3: OP-AMP LOGIC ---
+        let currentOpAmp = {};
+        function generateOpAmp() {
+            currentOpAmp.vin = (Math.random() * 0.9 + 0.1).toFixed(1);
+            currentOpAmp.rin = [1, 5, 10][Math.floor(Math.random() * 3)];
+            currentOpAmp.rf = [10, 22, 47, 100][Math.floor(Math.random() * 4)];
+            
+            document.getElementById('op-vin-txt').textContent = currentOpAmp.vin + 'V';
+            document.getElementById('op-rin-txt').textContent = 'Rin: ' + currentOpAmp.rin + 'k';
+            document.getElementById('op-rf-txt').textContent = 'Rf: ' + currentOpAmp.rf + 'k';
+            document.getElementById('feedback-opamp').style.display = 'none';
+            document.getElementById('ans-opamp').value = '';
+        }
+        function checkOpAmp() {
+            const userAns = parseFloat(document.getElementById('ans-opamp').value);
+            // Inverting Gain = -Rf/Rin
+            const correctVout = -currentOpAmp.vin * (currentOpAmp.rf / currentOpAmp.rin);
+            
+            if (Math.abs(userAns - correctVout) < 0.2) {
+                showFeedback('feedback-opamp', true, `Correct! Gain = -(${currentOpAmp.rf} / ${currentOpAmp.rin}) = -${currentOpAmp.rf/currentOpAmp.rin}. Vout = Gain × Vin = ${correctVout.toFixed(2)}V.`);
+            } else {
+                showFeedback('feedback-opamp', false, "Incorrect. Remember this is an INVERTING amplifier. Gain = -(Rf / Rin). Your answer should be negative!");
+            }
+        }
+
+        // --- TAB 4: LOGIC GATES ---
+        let currentLogic = {};
+        function generateLogic() {
+            currentLogic.a = Math.round(Math.random());
+            currentLogic.b = Math.round(Math.random());
+            currentLogic.c = Math.round(Math.random());
+            
+            document.getElementById('log-a-txt').textContent = 'A: ' + currentLogic.a;
+            document.getElementById('log-b-txt').textContent = 'B: ' + currentLogic.b;
+            document.getElementById('log-c-txt').textContent = 'C: ' + currentLogic.c;
+            document.getElementById('feedback-logic').style.display = 'none';
+            document.getElementById('ans-logic').value = '';
+        }
+        function checkLogic() {
+            const userAns = parseInt(document.getElementById('ans-logic').value);
+            // X = A AND B. Y = C OR X.
+            const x = (currentLogic.a && currentLogic.b) ? 1 : 0;
+            const correctY = (currentLogic.c || x) ? 1 : 0;
+            
+            if (userAns === correctY) {
+                showFeedback('feedback-logic', true, `Correct! A AND B = ${x}. Then, ${currentLogic.c} OR ${x} = ${correctY}.`);
+            } else {
+                showFeedback('feedback-logic', false, "Incorrect. Evaluate the AND gate first, then pass that result into the OR gate with C.");
+            }
+        }
+
+        // Initialize all tabs on load
+        generateLED();
+        generateLDR();
+        generateOpAmp();
+        generateLogic();
+
     </script>
-
 </body>
 </html>
