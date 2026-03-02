@@ -163,15 +163,44 @@
         /* Feedback Boxes */
         .feedback {
             margin-top: 15px;
-            padding: 15px;
+            padding: 20px;
             border-radius: 6px;
             text-align: left;
             font-size: 1rem;
             display: none;
+            line-height: 1.6;
         }
-        .feedback.correct { background: #c6f6d5; color: #22543d; display: block; border-left: 4px solid #48bb78; font-weight: bold; text-align: center;}
-        .feedback.incorrect { background: #fed7d7; color: #822727; display: block; border-left: 4px solid #f56565; font-weight: bold; text-align: center;}
-        .feedback.solution { background: #e6f0fa; color: #001f3f; display: block; border-left: 4px solid var(--abingdon-navy); }
+        .feedback.correct { background: #c6f6d5; color: #22543d; display: block; border-left: 5px solid #48bb78; font-weight: bold; text-align: center;}
+        .feedback.incorrect { background: #fed7d7; color: #822727; display: block; border-left: 5px solid #f56565; font-weight: bold; text-align: center;}
+        
+        /* Detailed Solution Box Styling */
+        .feedback.solution { 
+            background: #e6f0fa; 
+            color: #001f3f; 
+            display: block; 
+            border-top: 5px solid var(--abingdon-navy);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .feedback.solution h3 {
+            margin-top: 0;
+            color: var(--abingdon-cerise);
+            border-bottom: 1px solid #cbd5e0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .feedback.solution ol { margin-top: 0; padding-left: 20px; }
+        .feedback.solution li { margin-bottom: 15px; }
+        .math-step {
+            display: inline-block;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e0;
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-top: 5px;
+            color: var(--abingdon-cerise-dark);
+        }
 
         svg { max-width: 100%; height: auto; }
     </style>
@@ -483,10 +512,10 @@
         function showSolution(id, message) {
             const el = document.getElementById(id);
             el.className = 'feedback solution';
-            el.innerHTML = message;
+            el.innerHTML = `<h3>Step-by-Step Worked Solution</h3>${message}`;
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // Sets individual input box to red or green
         function setInputFeedback(id, isCorrect) {
             const el = document.getElementById(id);
             if (isCorrect) {
@@ -498,7 +527,6 @@
             }
         }
 
-        // Clears red/green formatting from an input box
         function clearInputFeedback(id) {
             const el = document.getElementById(id);
             el.value = '';
@@ -544,7 +572,6 @@
 
             let allCorrect = true;
 
-            // Apply specific box feedback
             if (uV2 === cV2) setInputFeedback('ans-mixed-v2', true); else { setInputFeedback('ans-mixed-v2', false); allCorrect = false; }
             if (uI3 === cI3) setInputFeedback('ans-mixed-i3', true); else { setInputFeedback('ans-mixed-i3', false); allCorrect = false; }
             if (uV3 === cV3) setInputFeedback('ans-mixed-v3', true); else { setInputFeedback('ans-mixed-v3', false); allCorrect = false; }
@@ -582,11 +609,21 @@
             document.getElementById('ans-mixed-v3').value = cV3;
             document.getElementById('ans-mixed-i4').value = cI4;
 
-            const msg = `<strong>Worked Solution:</strong> (Scoring disabled for this problem)<br><br>
-            (a) Parallel branches share the same voltage. V₂ = V₁ = <strong>${cV2}V</strong>.<br>
-            (b) Currents sum at a junction. I₃ = I₁ + I₂ = ${currentMixed.i1} + ${currentMixed.i2} = <strong>${cI3}mA</strong>.<br>
-            (c) Series voltages sum to the supply. V₃ = Supply - V₁ = ${currentMixed.vs} - ${currentMixed.v1} = <strong>${cV3}V</strong>.<br>
-            (d) Total current must return to the source. I₄ = I₃ = <strong>${cI4}mA</strong>.`;
+            const msg = `
+            <ol>
+                <li><strong>Find V₂ (Parallel Voltage):</strong> Components in parallel share the same potential difference. Therefore, V₂ is equal to V₁.<br>
+                <span class="math-step">V₂ = ${cV2}V</span></li>
+                
+                <li><strong>Find I₃ (Kirchhoff's Current Law):</strong> The currents from the two parallel branches combine at the junction before entering the series section.<br>
+                <span class="math-step">I₃ = I₁ + I₂ = ${currentMixed.i1}mA + ${currentMixed.i2}mA = ${cI3}mA</span></li>
+                
+                <li><strong>Find V₃ (Kirchhoff's Voltage Law):</strong> The total supply voltage must equal the sum of the voltage drops around any loop. <br>
+                <span class="math-step">V₃ = Supply Voltage - V₁ = ${currentMixed.vs}V - ${currentMixed.v1}V = ${cV3}V</span></li>
+                
+                <li><strong>Find I₄ (Return Current):</strong> The total current flowing back to the 0V rail must match the total current flowing out of the junction.<br>
+                <span class="math-step">I₄ = I₃ = ${cI4}mA</span></li>
+            </ol>
+            <em>(Note: Revealing the solution disables scoring for this specific problem).</em>`;
             showSolution('feedback-mixed', msg);
         }
 
@@ -618,7 +655,7 @@
                 solvedState.led = true;
                 document.getElementById('btn-check-led').disabled = true;
                 document.getElementById('btn-reveal-led').disabled = true;
-                showFeedback('feedback-led', true, `Correct! ${currentLED.vs}V - ${currentLED.vf}V = ${(currentLED.vs - currentLED.vf).toFixed(1)}V across the resistor. R = V/I = ${(currentLED.vs - currentLED.vf).toFixed(1)} / 0.${currentLED.i}A = ${correctR.toFixed(0)}Ω.`);
+                showFeedback('feedback-led', true, `Correct!`);
             } else {
                 setInputFeedback('ans-led', false);
                 showFeedback('feedback-led', false, "Incorrect. Try again! (Hint: Subtract Vf from the supply voltage first).");
@@ -636,10 +673,17 @@
             const correctR = ((currentLED.vs - currentLED.vf) / (currentLED.i / 1000)).toFixed(0);
             document.getElementById('ans-led').value = correctR;
 
-            const msg = `<strong>Worked Solution:</strong> (Scoring disabled)<br><br>
-            1. Calculate voltage across the resistor: V_resistor = Supply - Vf = ${currentLED.vs} - ${currentLED.vf} = ${(currentLED.vs - currentLED.vf).toFixed(1)}V.<br>
-            2. Convert current to Amps: ${currentLED.i}mA = ${currentLED.i / 1000}A.<br>
-            3. Use Ohm's Law (R = V / I): R = ${(currentLED.vs - currentLED.vf).toFixed(1)} / ${currentLED.i / 1000} = <strong>${correctR}Ω</strong>.`;
+            const msg = `
+            <ol>
+                <li><strong>Calculate the Voltage Drop:</strong> The resistor must "soak up" the extra voltage not used by the LED.<br>
+                <span class="math-step">V_resistor = Supply - Vf = ${currentLED.vs}V - ${currentLED.vf}V = ${(currentLED.vs - currentLED.vf).toFixed(1)}V</span></li>
+                
+                <li><strong>Convert Current to Standard Units:</strong> Ohm's law requires current to be in Amperes, not milliamperes (mA).<br>
+                <span class="math-step">I = ${currentLED.i}mA / 1000 = ${currentLED.i / 1000}A</span></li>
+                
+                <li><strong>Apply Ohm's Law:</strong> Rearrange V = I × R to find Resistance.<br>
+                <span class="math-step">R = V / I = ${(currentLED.vs - currentLED.vf).toFixed(1)}V / ${currentLED.i / 1000}A = ${correctR}Ω</span></li>
+            </ol>`;
             showSolution('feedback-led', msg);
         }
 
@@ -700,10 +744,20 @@
             const correctV = (currentLDR.vs * (currentLDR.r2 / (currentLDR.r1 + currentLDR.r2))).toFixed(2);
             document.getElementById('ans-ldr').value = correctV;
 
-            const msg = `<strong>Worked Solution:</strong> (Scoring disabled)<br><br>
-            Using the Voltage Divider Formula: Vout = Vin × [ R_bottom / (R_top + R_bottom) ]<br>
-            Vout = ${currentLDR.vs}V × [ ${currentLDR.r2}kΩ / (${currentLDR.r1}kΩ + ${currentLDR.r2}kΩ) ]<br>
-            Vout = <strong>${correctV}V</strong>.`;
+            const msg = `
+            <ol>
+                <li><strong>Recall the Voltage Divider Formula:</strong><br>
+                <span class="math-step">V_out = V_in × [ R_bottom / (R_top + R_bottom) ]</span></li>
+                
+                <li><strong>Substitute the Known Values:</strong><br>
+                <span class="math-step">V_out = ${currentLDR.vs}V × [ ${currentLDR.r2} / (${currentLDR.r1} + ${currentLDR.r2}) ]</span></li>
+                
+                <li><strong>Solve the Bracket:</strong><br>
+                <span class="math-step">V_out = ${currentLDR.vs} × [ ${currentLDR.r2} / ${(currentLDR.r1 + currentLDR.r2).toFixed(1)} ]</span></li>
+                
+                <li><strong>Calculate Final Output:</strong><br>
+                <span class="math-step">V_out = ${correctV}V</span></li>
+            </ol>`;
             showSolution('feedback-ldr', msg);
         }
 
@@ -753,10 +807,16 @@
             const correctVout = (-currentOpAmp.vin * (currentOpAmp.rf / currentOpAmp.rin)).toFixed(2);
             document.getElementById('ans-opamp').value = correctVout;
 
-            const msg = `<strong>Worked Solution:</strong> (Scoring disabled)<br><br>
-            1. Calculate Gain = -(Rf / Rin) = -(${currentOpAmp.rf}k / ${currentOpAmp.rin}k) = -${currentOpAmp.rf/currentOpAmp.rin}.<br>
-            2. Calculate Output = Gain × Vin = -${currentOpAmp.rf/currentOpAmp.rin} × ${currentOpAmp.vin}V = <strong>${correctVout}V</strong>.<br>
-            <em>*Note: The negative sign is crucial because it is an inverting amplifier!</em>`;
+            const msg = `
+            <ol>
+                <li><strong>Identify the Amplifier Type:</strong> The input signal is connected to the negative (-) terminal, so this is an <em>Inverting Amplifier</em>.</li>
+                
+                <li><strong>Calculate the Voltage Gain:</strong> The formula for inverting gain is -(Rf / Rin).<br>
+                <span class="math-step">Gain = -(${currentOpAmp.rf}kΩ / ${currentOpAmp.rin}kΩ) = -${currentOpAmp.rf/currentOpAmp.rin}</span></li>
+                
+                <li><strong>Calculate the Output Voltage:</strong> Multiply the input voltage by the gain.<br>
+                <span class="math-step">V_out = Gain × V_in = -${currentOpAmp.rf/currentOpAmp.rin} × ${currentOpAmp.vin}V = ${correctVout}V</span></li>
+            </ol>`;
             showSolution('feedback-opamp', msg);
         }
 
@@ -808,9 +868,14 @@
             const correctY = (currentLogic.c || x) ? 1 : 0;
             document.getElementById('ans-logic').value = correctY;
 
-            const msg = `<strong>Worked Solution:</strong> (Scoring disabled)<br><br>
-            1. First, evaluate the AND gate (Top): A(${currentLogic.a}) AND B(${currentLogic.b}) = ${x}.<br>
-            2. Then, pass that into the OR gate (Bottom) with C: ${x} OR C(${currentLogic.c}) = <strong>${correctY}</strong>.`;
+            const msg = `
+            <ol>
+                <li><strong>Evaluate the Top Gate (AND):</strong> An AND gate only outputs 1 if ALL inputs are 1.<br>
+                <span class="math-step">Input A (${currentLogic.a}) AND Input B (${currentLogic.b}) = Output ${x}</span></li>
+                
+                <li><strong>Evaluate the Final Gate (OR):</strong> An OR gate outputs 1 if ANY of its inputs are 1. We use the result of the previous gate and Input C.<br>
+                <span class="math-step">Previous Result (${x}) OR Input C (${currentLogic.c}) = Final Output ${correctY}</span></li>
+            </ol>`;
             showSolution('feedback-logic', msg);
         }
 
