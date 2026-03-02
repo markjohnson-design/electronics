@@ -209,7 +209,7 @@
 
     <div class="header-container">
         <h1>Abingdon School</h1>
-        <p class="subtitle">IGCSE Electronics Interactive Revision</p>
+        <p class="subtitle">GCSE Electronics Interactive Revision</p>
     </div>
 
     <div class="scoreboard">
@@ -503,14 +503,18 @@
             evt.currentTarget.classList.add("active");
         }
 
+        // --- BUG FIX: Added el.style.display = '' to clear the inline hiding ---
         function showFeedback(id, isCorrect, message) {
             const el = document.getElementById(id);
+            el.style.display = ''; // Clear inline 'none' style!
             el.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
             el.innerHTML = message;
         }
 
+        // --- BUG FIX: Added el.style.display = '' to clear the inline hiding ---
         function showSolution(id, message) {
             const el = document.getElementById(id);
+            el.style.display = ''; // Clear inline 'none' style!
             el.className = 'feedback solution';
             el.innerHTML = `<h3>Step-by-Step Worked Solution</h3>${message}`;
             el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -551,7 +555,7 @@
             document.getElementById('mixed-i1').textContent = currentMixed.i1 + 'mA';
             document.getElementById('mixed-i2').textContent = currentMixed.i2 + 'mA';
             
-            document.getElementById('feedback-mixed').style.display = 'none';
+            document.getElementById('feedback-mixed').style.display = 'none'; // Re-hide on new problem
             ['ans-mixed-v2', 'ans-mixed-i3', 'ans-mixed-v3', 'ans-mixed-i4'].forEach(clearInputFeedback);
         }
         function checkMixed() {
@@ -639,7 +643,7 @@
             document.getElementById('led-vs-txt').textContent = currentLED.vs + 'V';
             document.getElementById('led-vf-txt').textContent = 'Vf: ' + currentLED.vf + 'V';
             document.getElementById('led-i-txt').textContent = 'Target: ' + currentLED.i + 'mA';
-            document.getElementById('feedback-led').style.display = 'none';
+            document.getElementById('feedback-led').style.display = 'none'; // Re-hide
             clearInputFeedback('ans-led');
         }
         function checkLED() {
@@ -655,7 +659,7 @@
                 solvedState.led = true;
                 document.getElementById('btn-check-led').disabled = true;
                 document.getElementById('btn-reveal-led').disabled = true;
-                showFeedback('feedback-led', true, `Correct!`);
+                showFeedback('feedback-led', true, `Correct! ${currentLED.vs}V - ${currentLED.vf}V = ${(currentLED.vs - currentLED.vf).toFixed(1)}V across the resistor. R = V/I = ${(currentLED.vs - currentLED.vf).toFixed(1)} / 0.${currentLED.i}A = ${correctR.toFixed(0)}Ω.`);
             } else {
                 setInputFeedback('ans-led', false);
                 showFeedback('feedback-led', false, "Incorrect. Try again! (Hint: Subtract Vf from the supply voltage first).");
@@ -697,7 +701,7 @@
             currentLDR.r1 = [1, 2.2, 4.7, 10][Math.floor(Math.random() * 4)];
             document.getElementById('ldr-vs-txt').textContent = currentLDR.vs + 'V';
             document.getElementById('ldr-r1-txt').textContent = 'R1: ' + currentLDR.r1 + 'kΩ';
-            document.getElementById('feedback-ldr').style.display = 'none';
+            document.getElementById('feedback-ldr').style.display = 'none'; // Re-hide
             document.getElementById('ldr-slider').value = 1;
             clearInputFeedback('ans-ldr');
             updateLDR();
@@ -773,7 +777,7 @@
             document.getElementById('op-vin-txt').textContent = currentOpAmp.vin + 'V';
             document.getElementById('op-rin-txt').textContent = 'Rin: ' + currentOpAmp.rin + 'k';
             document.getElementById('op-rf-txt').textContent = 'Rf: ' + currentOpAmp.rf + 'k';
-            document.getElementById('feedback-opamp').style.display = 'none';
+            document.getElementById('feedback-opamp').style.display = 'none'; // Re-hide
             clearInputFeedback('ans-opamp');
         }
         function checkOpAmp() {
@@ -832,7 +836,7 @@
             document.getElementById('log-a-txt').textContent = 'A: ' + currentLogic.a;
             document.getElementById('log-b-txt').textContent = 'B: ' + currentLogic.b;
             document.getElementById('log-c-txt').textContent = 'C: ' + currentLogic.c;
-            document.getElementById('feedback-logic').style.display = 'none';
+            document.getElementById('feedback-logic').style.display = 'none'; // Re-hide
             clearInputFeedback('ans-logic');
         }
         function checkLogic() {
